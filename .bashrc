@@ -60,12 +60,6 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-#if [ "$color_prompt" = yes ]; then
-#    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
-#else
-#    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-#fi
-
 # Fancy prompt taken from Kali Linux bashrc
 
 if [ "$color_prompt" = yes ]; then
@@ -117,7 +111,7 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 # colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
 alias ll='ls -al'
@@ -146,26 +140,11 @@ fi
 
 export PATH="$HOME/.local/bin:/opt/gcc-eabi/bin:$PATH"
 
-echo "Funktionen:"
-echo "------------------------------------"
-echo "- MQTT Broker"
-echo "- MQTT Client"
-echo "- Jupyter Notebook Server (starten mit 'jupyter notebook')"
-echo "- alle 5min Wetterdaten zu Datacake hochladen"
-echo "- AVR Dev Toolchain, incl. avrdude"
-echo "- gcc für embedded stm32 arm (in /opt/gcc-eabi)"
-echo "- stlink-tools, stm32flash"
-echo "- PHP"
-echo
-
-
-
 PATH="/home/elsni/perl5/bin${PATH:+:${PATH}}"; export PATH;
 PERL5LIB="/home/elsni/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
 PERL_LOCAL_LIB_ROOT="/home/elsni/perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
 PERL_MB_OPT="--install_base \"/home/elsni/perl5\""; export PERL_MB_OPT;
 PERL_MM_OPT="INSTALL_BASE=/home/elsni/perl5"; export PERL_MM_OPT;
-
 
 # -------------------------------------------------------------------------------
 # some more useful stuff
@@ -188,6 +167,21 @@ alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 
+# since ifconfig is deprecated we need a substitute
 alias ifconfig="ip -c a"
 
-
+# -------------------------------------------------------------------------------
+# Message to show on login
+# -------------------------------------------------------------------------------
+echo "-----------------------------------------------------------"
+echo "Funktionen:"
+echo "-----------------------------------------------------------"
+echo "- MQTT Broker"
+echo "- MQTT Client"
+echo "- Jupyter Notebook Server (starten mit 'jupyter notebook')"
+echo "- alle 5min Wetterdaten zu Datacake hochladen"
+echo "- AVR Dev Toolchain, incl. avrdude"
+echo "- gcc für embedded stm32 arm (in /opt/gcc-eabi)"
+echo "- stlink-tools, stm32flash"
+echo "- PHP"
+echo
