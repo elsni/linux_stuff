@@ -173,15 +173,4 @@ alias ifconfig="ip -c a"
 # -------------------------------------------------------------------------------
 # Message to show on login
 # -------------------------------------------------------------------------------
-echo "-----------------------------------------------------------"
-echo "Funktionen:"
-echo "-----------------------------------------------------------"
-echo "- MQTT Broker"
-echo "- MQTT Client"
-echo "- Jupyter Notebook Server (starten mit 'jupyter notebook')"
-echo "- alle 5min Wetterdaten zu Datacake hochladen"
-echo "- AVR Dev Toolchain, incl. avrdude"
-echo "- gcc für embedded stm32 arm (in /opt/gcc-eabi)"
-echo "- stlink-tools, stm32flash"
-echo "- PHP"
-echo
+echo ".bashrc loaded!"
