@@ -170,6 +170,9 @@ alias .....="cd ../../../.."
 # since ifconfig is deprecated we need a substitute
 alias ifconfig="ip -c a"
 
+# make SDL stop complaining about no mouse
+export SDL_NOMOUSE="1"
+
 # -------------------------------------------------------------------------------
 # Message to show on login
 # -------------------------------------------------------------------------------
