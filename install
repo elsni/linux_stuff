@@ -2,3 +2,5 @@
 
 cp -a -v home/. ~/
 sudo cp -a -v etc/. /etc
+sudo apt install neofetch
+
