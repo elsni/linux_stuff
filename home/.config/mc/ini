@@ -62,6 +62,7 @@ editor_group_undo=true
 editor_state_full_filename=true
 editor_ask_filename_before_edit=false
 nice_rotating_dash=true
+shadows=true
 mcview_remember_file_position=false
 auto_fill_mkdir_name=true
 copymove_persistent_attr=true
@@ -85,18 +86,18 @@ mcview_eof=
 skin=default
 
 [Layout]
-message_visible=1
-keybar_visible=1
-xterm_title=1
 output_lines=0
-command_prompt=1
-menubar_visible=1
-free_space=1
-horizontal_split=0
-vertical_equal=1
-left_panel_size=105
-horizontal_equal=1
-top_panel_size=1
+left_panel_size=86
+top_panel_size=0
+message_visible=true
+keybar_visible=true
+xterm_title=true
+command_prompt=true
+menubar_visible=true
+free_space=true
+horizontal_split=false
+vertical_equal=true
+horizontal_equal=true
 
 [Misc]
 timeformat_recent=%b %e %H:%M
@@ -114,8 +115,6 @@ clipboard_paste=
 base_color=
 xterm-256color=
 color_terminals=
-
-xterm=
 
 [Panels]
 show_mini_info=true
