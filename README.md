@@ -4,6 +4,7 @@ Here you find my setup files for my linux console environment.
 
 it includes:
 - nice command aliases (like ll for ls -al  etc..)
+- console prompt "borrowed" from Kali Linux
 - Midnight Commander (mc) configuration
 - nano editor configuration
 
