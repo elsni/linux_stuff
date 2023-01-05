@@ -7,8 +7,12 @@ it includes:
 - console prompt "borrowed" from Kali Linux
 - Midnight Commander (mc) configuration
 - nano editor configuration
+- colourful greeting message with neofetch figlet and lolcat
 
-configuration files for my personal taste.
+These are configuration files for my personal taste.
 
 Unless otherwise stated, the config files should work in any linux distro.
-Make sure you have nano, mc and neofetch installed.
+
+The install script installs all dependencies for you, use it like
+
+    sudo ./install.sh
