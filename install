@@ -1,6 +1,8 @@
 #!/bin/bash
 
+sudo apt install neofetch figlet lolcat -y
 cp -a -v home/. ~/
+sudo cp -a -v home/. /root
 sudo cp -a -v etc/. /etc
 sudo apt install neofetch
 

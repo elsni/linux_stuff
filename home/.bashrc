@@ -68,11 +68,11 @@ if [ "$color_prompt" = yes ]; then
 
 	prompt_color='\[\033[;32m\]'
     info_color='\[\033[1;34m\]'
-    prompt_symbol=㉿
+    prompt_symbol=@
    	if [ "$EUID" -eq 0 ]; then # Change prompt colors for root user
        prompt_color='\[\033[;94m\]'
        info_color='\[\033[1;31m\]'
-       prompt_symbol=💀
+       prompt_symbol=@
    	fi
    	case "$PROMPT_ALTERNATIVE" in
         twoline)
@@ -170,6 +170,9 @@ alias .....="cd ../../../.."
 # since ifconfig is deprecated we need a substitute
 alias ifconfig="ip -c a"
 
+# for showing all mqtt messages
+alias mqtt="mosquitto_sub -v -h localhost -p 1883 -t '#'"
+
 # make SDL stop complaining about no mouse
 export SDL_NOMOUSE="1"
 
@@ -178,3 +181,6 @@ export SDL_NOMOUSE="1"
 # -------------------------------------------------------------------------------
 echo
 neofetch
+echo "Welcome to"
+hostname | figlet | /usr/games/lolcat
+
