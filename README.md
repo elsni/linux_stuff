@@ -15,4 +15,4 @@ Unless otherwise stated, the config files should work in any linux distro.
 
 The install script installs all dependencies for you, use it like
 
-    sudo ./install.sh
+    sudo ./install
