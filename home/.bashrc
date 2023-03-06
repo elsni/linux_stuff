@@ -114,9 +114,9 @@ fi
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # some more ls aliases
-alias ll='ls -al'
-alias la='ls -A'
-alias l='ls -CF'
+alias ll='exa -al'
+alias la='exa -a'
+alias l='exa -aF'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -138,7 +138,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export PATH="$HOME/.local/bin:/opt/gcc-eabi/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:/opt/gcc-eabi/bin:$PATH"
 
 PATH="/home/elsni/perl5/bin${PATH:+:${PATH}}"; export PATH;
 PERL5LIB="/home/elsni/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
@@ -183,4 +183,13 @@ echo
 neofetch
 echo "Welcome to"
 hostname | figlet | /usr/games/lolcat
+
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+export GOROOT="/usr/local/go"
+export GOPATH=$HOME/source/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 
