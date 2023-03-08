@@ -1,6 +1,9 @@
 # linux_stuff
 
-Here you find my setup files for my linux console environment.
+Here you find my setup files for a linux console environment
+of my personal taste.
+It works with debian based distros such as:
+Debian,(K/L)Ubuntu, Bunsenlabs, DietPi, Raspi OS, Mint ...
 
 it includes:
 - nice command aliases (like ll for ls -al  etc..)
