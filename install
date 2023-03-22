@@ -1,6 +1,24 @@
 #!/bin/bash
 
+get_abs_filename() {
+  # $1 : relative filename
+  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+}
+
 sudo apt install neofetch figlet lolcat exa -y
-cp -a -v home/. ~/
-sudo cp -a -v home/. /root
-sudo cp -a -v etc/. /etc
+
+# renaming current config
+mv ~/.config/mc ~/.config/mc_old 2> /dev/null
+mv ~/.config/herbstluftwm ~/.config/herbstluftwm_old 2> /dev/null
+mv ~/.config/neofetch ~/.config/neofetch_old 2> /dev/null
+mv ~/.config/alacritty ~/.config/alacritty_old 2> /dev/null
+mv ~/.config/nano ~/.config/nano_old 2> /dev/null
+mv ~/.bashrc ~/.bashrc_old 2> /dev/null
+
+# symlinking files
+ln -s $(get_abs_filename "home/.config/mc") ~/.config/mc
+ln -s $(get_abs_filename "home/.config/herbstluftwm") ~/.config/herbstluftwm
+ln -s $(get_abs_filename "home/.config/neofetch") ~/.config/neofetch
+ln -s $(get_abs_filename "home/.config/alacritty") ~/.config/alacritty
+ln -s $(get_abs_filename "home/.config/nano") ~/.config/nano
+ln -s $(get_abs_filename "home/.bashrc") ~/.bashrc
