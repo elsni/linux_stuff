@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+sudo apt install fonts-noto fonts-noto-color-emoji
+
 fonts_dir="${HOME}/.local/share/fonts"
 if [ ! -d "${fonts_dir}" ]; then
     echo "mkdir -p $fonts_dir"

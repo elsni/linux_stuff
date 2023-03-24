@@ -28,7 +28,31 @@ it includes configuration for:
 - Fira Code font
 
 ## herbstluftwm
-- very basic, work in progress
+- green focus
+- polybar
+- switch off laptop screen when a monitor is connected to HDMI-1
+### important keybindings (not all are customized)
+	win-alt-s        open spotify
+	win-alt-b        open Brave Browser
+	win-Esc          close current window
+    win-, and  win-. navigate through tags (workspaces)
+	win-arrows       move window focus to next window
+	win-shift-arrows move window
+    win-space        open launcher
+    win-shift-q      logout
+
+## Polybar
+- displays herbsluftwm workspaces
+- displays weather for Lübeck/Germany
+- displays local date/time
+- displays CPU-load, free RAM and core Temp.
+- displays current audio level
+- displays current IP
+- Power-Off/logout button
+
+in Tray:
+- blueman-applet (Bluetooth control)
+- nm-applet (wifi network connection management)
 
 # Dependencies
 You need to have the following packets installed:
@@ -40,20 +64,23 @@ You need to have the following packets installed:
 - alacritty
 - lolcat
 - figlet
-- Fira Code Font - you can use the included script ./installfonts
+- polybar
 
-# Installation
+# Font-Dependencies
+- Fira Code Font
+- Noto Sans (preinstalled on linux Mint)
+- Noto Sans Symbols2 (preinstalled on linux Mint)
+- Noto Color Emoji (preinstalled on linux Mint)
 
-	./installfonts
+# Font Installation
 
-Installs the free and fantastic Fira Code font, to use with alacritty
-terminal emulator.
+	./installdeps
+
+Installs the app and font dependencies on ubuntu/debian based systems
+
+# dotfiles installation
 
 	./install
 
-The install script installs some dependencies for you
-and symlinks the dotfiles
-
-you need to be able to 'sudo'
-
+The install script renames old dotfiles and symlinks the ones from this package
 

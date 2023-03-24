@@ -12,36 +12,70 @@ create_safelink() {
     # no, rename old dir
     mv "$HOME/$1" "$HOME/$1_old" 2> /dev/null
   fi
-  ## create a link to the config 
+  ## create a link to the config
   ln -s $(get_abs_filename "$2") "$HOME/$1"
 }
 
-# sudo apt install neofetch figlet lolcat exa -y
 
-cd home/.config
+install_dotfiles() {
+  cd home/.config
 
-for d in */; do
-  dir=${d::-1}  # remove ending slash
-  create_safelink ".config/$dir" "$dir"
-done
+  for d in */; do
+    dir=${d::-1}  # remove ending slash
+    create_safelink ".config/$dir" "$dir"
+  done
 
-cd ..
-create_safelink ".bashrc" ".bashrc" 
+  cd ..
+  create_safelink ".bashrc" ".bashrc"
+}
 
-exit
+install_fira_font() {
+  fonts_dir="${HOME}/.local/share/fonts"
+  if [ ! -d "${fonts_dir}" ]; then
+    mkdir -p "${fonts_dir}"
+  fi
+  echo "downloading Fira code..."
+  version=5.2
+  zip=Fira_Code_v${version}.zip
+  curl --fail --location --show-error https://github.com/tonsky/FiraCode/releases/download/${version}/${zip} --output ${zip}
+  unzip -o -q -d ${fonts_dir} ${zip}
+  rm ${zip}
+  echo "rebuilding font cache..."
+  fc-cache -f
+}
+
+# ---------------------- main ------------------------------------------
+
+case "$1" in
+  "")
+    echo "Install Elsni's linux environment"
+    echo "usage: install <OPTION>"
+    echo "where OPTION can be:"
+    echo "-c   install dotfiles and dependencies for a console-only system (server)"
+    echo "-d   install dependencies and dotfiles for a desktop (gui) system"
+    echo "-a   install both, console and desktop stuff."
+    exit 0;;
+  "-c")
+    echo "installing console stuff..."
+    sudo apt install neofetch figlet lolcat exa mc nano -y
+    install_dotfiles
+    exit 0;;
+  "-d")
+    echo "installing desktop stuff..."
+    sudo apt install herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji -y
+    install_fira_font
+    install_dotfiles
+    exit 0;;
+  "-a")
+    echo "installing everything..."
+    sudo apt install neofetch figlet lolcat exa mc nano herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji -y
+    install_fira_font
+    install_dotfiles
+    exit 0;;
+  *)
+    echo "wrong parameter"
+    exit 1;;
+esac
 
 
-mv ~/.config/mc ~/.config/mc_old 2> /dev/null
-mv ~/.config/herbstluftwm ~/.config/herbstluftwm_old 2> /dev/null
-mv ~/.config/neofetch ~/.config/neofetch_old 2> /dev/null
-mv ~/.config/alacritty ~/.config/alacritty_old 2> /dev/null
-mv ~/.config/nano ~/.config/nano_old 2> /dev/null
-mv ~/.bashrc ~/.bashrc_old 2> /dev/null
 
-# symlinking files
-ln -s $(get_abs_filename "home/.config/mc") ~/.config/mc
-ln -s $(get_abs_filename "home/.config/herbstluftwm") ~/.config/herbstluftwm
-ln -s $(get_abs_filename "home/.config/neofetch") ~/.config/neofetch
-ln -s $(get_abs_filename "home/.config/alacritty") ~/.config/alacritty
-ln -s $(get_abs_filename "home/.config/nano") ~/.config/nano
-ln -s $(get_abs_filename "home/.bashrc") ~/.bashrc
