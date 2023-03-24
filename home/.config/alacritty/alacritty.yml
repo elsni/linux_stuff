@@ -182,13 +182,13 @@ font:
     style: Bold Italic
 
   # Point size
-  size: 12.0
+  size: 10.0
 
   # Offset is the extra space around each character. `offset.y` can be thought of
   # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
   offset:
     x: 0
-    y: 1
+    y: 0
 
   # Glyph offset determines the locations of the glyphs within their cells with
   # the default being at the bottom. Increasing `x` moves the glyph to the right,
@@ -251,28 +251,28 @@ schemes:
   DoomOne: &Elsni
     primary:
       background: '#000000'
-      foreground: '#bbc2cf'
+      foreground: '#ffffff'
     cursor:
       text: CellBackground
-      cursor: '#528bff'
+      cursor: '#ffa500'
     selection:
       text: CellForeground
-      background: '#3e4451'
+      background: '#40b0ff'
     normal:
       black:   '#000000'
       red:     '#ff0000'
       green:   '#00ff00'
-      yellow:  '#ffff00'
-      blue:    '#0000ff'
+      yellow:  '#a0a000'
+      blue:    '#0050ff'
       magenta: '#ff00ff'
       cyan:    '#00ffff'
-      white:   '#ffffff'
+      white:   '#e0e0e0'
     bright:
-      black:   '#808080'
-      red:     '#ff8080'
+      black:   '#505050'
+      red:     '#ff70a0'
       green:   '#80ff80'
       yellow:  '#ffff80'
-      blue:    '#8080ff'   # This is 2257a0 in Doom Emacs but I lightened it.
+      blue:    '#50b0ff'
       magenta: '#ff80ff'
       cyan:    '#80ffff'
       white:   '#ffffff'
@@ -621,16 +621,16 @@ colors: *Elsni
 #   - Linear
 #
 # Specifying a `duration` of `0` will disable the visual bell.
-#visual_bell:
-#  animation: EaseOutExpo
-#  duration: 0
-#  color: '#ffffff'
+visual_bell:
+  animation: EaseOutExpo
+  duration: 1
+  color: '#ffffff'
 
-#selection:
+selection:
   #semantic_escape_chars: ",│`|:\"' ()[]{}<>\t"
 
   # When set to `true`, selected text will be copied to the primary clipboard.
-  #save_to_clipboard: false
+  save_to_clipboard: true
 
 # Allow terminal applications to change Alacritty's window title.
 #dynamic_title: true
@@ -720,7 +720,7 @@ colors: *Elsni
   # If this is `true`, the cursor is temporarily hidden when typing.
   #hide_when_typing: false
 
-  #url:
+url:
     # URL launcher
     #
     # This program is executed when clicking on a text which is recognized as a URL.
@@ -732,9 +732,9 @@ colors: *Elsni
     #   - (macOS) open
     #   - (Linux/BSD) xdg-open
     #   - (Windows) explorer
-    #launcher:
-    #  program: xdg-open
-    #  args: []
+launcher:
+  program: brave-browser
+  args: []
 
     # URL modifiers
     #
@@ -878,7 +878,7 @@ key_bindings:
   - { key: Copy,      mods: None,          action: Copy                        }
   - { key: L,         mods: Control,       action: ClearLogNotice              }
   - { key: L,         mods: Control,       chars: "\x0c"                       }
-  - { key: PageUp,    mods: None,          action: ScrollPageUp,   mode: ~Alt  }
-  - { key: PageDown,  mods: None,          action: ScrollPageDown, mode: ~Alt  }
-  - { key: Home,      mods: Shift,         action: ScrollToTop,    mode: ~Alt  }
-  - { key: End,       mods: Shift,         action: ScrollToBottom, mode: ~Alt  }
+#  - { key: PageUp,    mods: None,          action: ScrollPageUp,   mode: ~Alt  }
+#  - { key: PageDown,  mods: None,          action: ScrollPageDown, mode: ~Alt  }
+#  - { key: Home,      mods: Shift,         action: ScrollToTop,    mode: ~Alt  }
+#  - { key: End,       mods: Shift,         action: ScrollToBottom, mode: ~Alt  }

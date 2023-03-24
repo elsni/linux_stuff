@@ -5,9 +5,32 @@ get_abs_filename() {
   echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
 }
 
-sudo apt install neofetch figlet lolcat exa -y
+create_safelink() {
+  if [[ -L "$HOME/$1" ]]; then     # check if dir is a symlink
+    rm "$HOME/$1"
+  else
+    # no, rename old dir
+    mv "$HOME/$1" "$HOME/$1_old" 2> /dev/null
+  fi
+  ## create a link to the config 
+  ln -s $(get_abs_filename "$2") "$HOME/$1"
+}
 
-# renaming current config
+# sudo apt install neofetch figlet lolcat exa -y
+
+cd home/.config
+
+for d in */; do
+  dir=${d::-1}  # remove ending slash
+  create_safelink ".config/$dir" "$dir"
+done
+
+cd ..
+create_safelink ".bashrc" ".bashrc" 
+
+exit
+
+
 mv ~/.config/mc ~/.config/mc_old 2> /dev/null
 mv ~/.config/herbstluftwm ~/.config/herbstluftwm_old 2> /dev/null
 mv ~/.config/neofetch ~/.config/neofetch_old 2> /dev/null
