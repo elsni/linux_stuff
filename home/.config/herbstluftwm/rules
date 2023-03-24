@@ -14,4 +14,4 @@ hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 
 hc rule class="brave-browser" tag='2'
 hc rule class="spotify" tag='5'
-
+hc rule class="Bluetooth Devices" floating=on

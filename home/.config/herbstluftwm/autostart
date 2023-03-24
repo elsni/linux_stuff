@@ -31,24 +31,18 @@ hc set tree_style '╾│ ├└╼─┐'
 # unlock, just to be sure
 hc unlock
 
-# do multi monitor setup here, e.g.:
-# hc set_monitors 1280x1024+0+0 1280x1024+1280+0
-# or simply:
-
-# Switch off Laptop Screen
-# xrandr --output eDP-1 --off
-
-#hc detect_monitors
-
 # check if HDMI-Display is present
 if xrandr -q | grep HDMI-1; then
   xrandr --output eDP-1 --off    # Switch off Laptop display
-  hc set_monitors 2560x1440+0+0
-else
-  hc set monitors 1440x720+0+30
 fi
 
+# shuld find ether laptop display or external display
+hc detect_monitors
 
+# make room for polybar
+hc pad 0 32
+
+# don't use built-in panel
 # find the panel
 #panel=~/.config/herbstluftwm/panel.sh
 #[ -x "$panel" ] || panel=/etc/xdg/herbstluftwm/panel.sh
@@ -59,3 +53,4 @@ fi
 
 hc spawn sh $HOME/.config/polybar/launch.sh
 hc spawn nm-applet
+hc spawn blueman-applet
