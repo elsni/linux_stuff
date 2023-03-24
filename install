@@ -1,4 +1,6 @@
 #!/bin/bash
+# Installer script for elsni's linux environment
+# (w) 2023 by Stephan Elsner
 
 get_abs_filename() {
   # $1 : relative filename
@@ -52,15 +54,16 @@ case "$1" in
     echo "usage: install <OPTION>"
     echo "where OPTION can be:"
     echo "-c   install dotfiles and dependencies for a console-only system (server)"
-    echo "-d   install dependencies and dotfiles for a desktop (gui) system"
+    echo "-g   install dependencies and dotfiles for a desktop (gui) system"
     echo "-a   install both, console and desktop stuff."
+    echo "-d   install dotfiles only, don't install any dependencies"
     exit 0;;
   "-c")
     echo "installing console stuff..."
     sudo apt install neofetch figlet lolcat exa mc nano -y
     install_dotfiles
     exit 0;;
-  "-d")
+  "-g")
     echo "installing desktop stuff..."
     sudo apt install herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji -y
     install_fira_font
@@ -72,10 +75,11 @@ case "$1" in
     install_fira_font
     install_dotfiles
     exit 0;;
+  "-d")
+    echo "installing dotfiles only..."
+    install_dotfiles
+    exit 0;;
   *)
     echo "wrong parameter"
     exit 1;;
 esac
-
-
-

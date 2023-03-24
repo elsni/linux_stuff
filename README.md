@@ -72,15 +72,15 @@ You need to have the following packets installed:
 - Noto Sans Symbols2 (preinstalled on linux Mint)
 - Noto Color Emoji (preinstalled on linux Mint)
 
-# Font Installation
-
-	./installdeps
-
-Installs the app and font dependencies on ubuntu/debian based systems
-
-# dotfiles installation
+# Installation
+There is an installer script which is able to install the needed dependencies and installs the dotfiles.
 
 	./install
 
-The install script renames old dotfiles and symlinks the ones from this package
+without any parameters it prints the usage.
 
+The install script basically installs the dependencies on ubuntu/debian based systens and 
+renames old dotfiles and symlinks to the ones from this package.
+If you are not on a debian-based distro you need to install the deendencies yourself and invoke the installer with
+	./install -d
+to symlink the dotfiles only.
