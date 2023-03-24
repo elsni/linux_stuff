@@ -28,7 +28,7 @@ hc keybind $WIN-Shift-r reload
 hc keybind $WIN-Escape close
 
 # applications
-hc keybind $WIN-Return spawn $TERMINAL    
+hc keybind $WIN-Return spawn $TERMINAL
 #hc keybind $WIN-Return spawn "${TERMINAL:-alacritty}" # use your $TERMINAL with xterm as fallback
 hc keybind $WIN-$ALT-b spawn brave-browser &
 #hc keybind $WIN-$ALT-b spawn ~/.config/herbstluftwm/scripts/exec_on_tag.sh brave brave-browser 
@@ -128,7 +128,7 @@ hc mousebind $Mod-Button3 resize
 hc unrule -F
 #hc rule class=XTerm tag=3 # move all xterms to tag 3
 hc rule focus=on # normally focus new clients
-hc rule floatplacement=smart
+hc rule floatplacement=center
 #hc rule focus=off # normally do not focus new clients
 # give focus to most common terminals
 #hc rule class~'(.*[Rr]xvt.*|.*[Tt]erm|Konsole)' focus=on
@@ -146,9 +146,15 @@ hc set tree_style '╾│ ├└╼─┐'
 # unlock, just to be sure
 hc unlock
 
+#############################################################################################################
+# Screen Setup
 # check if HDMI-Display is present
-if xrandr -q | grep HDMI-1; then
+if xrandr -q | grep "HDMI-1 connected"; then
   xrandr --output eDP-1 --off    # Switch off Laptop display
+  xrandr --output HDMI-1 --on    # Switch on external display
+else
+  xrandr --output eDP-1 --on    # Switch on Laptop display
+  xrandr --output HDMI-1 --off    # Switch off external display
 fi
 
 # shuld find ether laptop display or external display
@@ -225,7 +231,7 @@ hc set mouse_recenter_gap 0
 
 #############################################################################################################
 # app autostart
-xwallpaper --zoom $HOME/.config/herbstluftwm/themes/wallpaper.jpg
+xwallpaper --zoom $HOME/.config/herbstluftwm/assets/wallpaper.jpg
 hc spawn sh $HOME/.config/polybar/launch.sh
 hc spawn nm-applet
 hc spawn blueman-applet

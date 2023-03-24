@@ -1,0 +1,5 @@
+XTerm*renderFont: true
+XTerm*faceName: VeraMono
+XTerm*faceSize: 10
+XTerm*background: black
+XTerm*foreground: white

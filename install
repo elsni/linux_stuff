@@ -29,6 +29,7 @@ install_dotfiles() {
 
   cd ..
   create_safelink ".bashrc" ".bashrc"
+  create_safelink ".Xresources" ".Xresources"
 }
 
 install_fira_font() {

@@ -114,6 +114,7 @@ fi
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export EXA_COLORS="da=6;37;40"
 export GTK_THEME=Adapta-Nokto:dark
+export SUDO_ASKPASS=/usr/bin/ssh-askpass
 
 # some more ls aliases
 alias ll='exa -al'

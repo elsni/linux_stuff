@@ -8,4 +8,4 @@ fi
 # Wait until the processes have been shut down
 while pgrep -x polybar >/dev/null; do sleep 1; done
 
-polybar mainbar-herbstluftwm &
+SUDO_ASKPASS=/usr/bin/ssh-askpass polybar mainbar-herbstluftwm &
