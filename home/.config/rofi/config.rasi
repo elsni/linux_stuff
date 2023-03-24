@@ -1,0 +1,6 @@
+configuration {
+  modi: "window,drun,ssh,filebrowser";
+  kb-cancel: "Escape,Alt+F1";
+ }
+
+@theme "Adapta-Nokto"

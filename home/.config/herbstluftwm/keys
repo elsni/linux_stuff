@@ -4,21 +4,25 @@
 hc keyunbind --all
 
 # keybindings
-# if you have a super key you will be much happier with Mod set to Mod4
-#Mod=Mod1    # Use alt as the main modifier
-Mod=Mod4   # Use the super key as the main modifier
-Win=Mod4
-Alt=Mod1
+Win=Mod4    # Windows Key is main modifyer
+Alt=Mod1    # Alt is 2nd modifyer, mainly for starting apps
+
+Terminal = alacritty
+
+export GTK_THEME=Adapta-Nokto:dark
 
 hc keybind $Win-Shift-q quit
 hc keybind $Win-Shift-r reload
 hc keybind $Win-Escape close
 
 # applications
-hc keybind $Win-Return spawn "${TERMINAL:-alacritty}" # use your $TERMINAL with xterm as fallback
+hc keybind $Win-Return spawn $Terminal    
+#hc keybind $Win-Return spawn "${TERMINAL:-alacritty}" # use your $TERMINAL with xterm as fallback
 hc keybind $Win-$Alt-b spawn brave-browser &
+#hc keybind $Win-$Alt-b spawn ~/.config/herbstluftwm/scripts/exec_on_tag.sh brave brave-browser 
 hc keybind $Win-$Alt-s spawn spotify &
-hc keybind $Win-space spawn rofi -show run
+hc keybind $Win-$Alt-n spawn ~/.config/herbstluftwm/scripts/launchnemo
+hc keybind $Win-space spawn rofi -modi drun -show run
  
 # basic movement in tiling and floating mode
 # focusing clients

@@ -12,6 +12,6 @@ hc rule windowtype~'_NET_WM_WINDOW_TYPE_(DIALOG|UTILITY|SPLASH)' floating=on
 hc rule windowtype='_NET_WM_WINDOW_TYPE_DIALOG' focus=on
 hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 
-hc rule class="brave-browser" tag='2'
-hc rule class="spotify" tag='5'
-hc rule class="Bluetooth Devices" floating=on
+hc rule class=Brave-browser tag=brave
+hc rule class=Spotify tag=5
+hc rule class=Blueman-manager floating=on

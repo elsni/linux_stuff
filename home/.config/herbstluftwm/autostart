@@ -19,9 +19,6 @@ source $HOME/.config/herbstluftwm/keys
 # mouse
 source $HOME/.config/herbstluftwm/mouse
 
-# theme
-source $HOME/.config/herbstluftwm/themes/main
-
 # rules
 source $HOME/.config/herbstluftwm/rules
 
@@ -50,6 +47,10 @@ hc pad 0 32
 #    # start it on each monitor
 #    "$panel" "$monitor" &
 #done
+
+# theme
+source $HOME/.config/herbstluftwm/themes/main
+
 
 hc spawn sh $HOME/.config/polybar/launch.sh
 hc spawn nm-applet

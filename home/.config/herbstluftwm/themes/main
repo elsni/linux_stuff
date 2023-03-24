@@ -3,6 +3,8 @@
 # theme
 xwallpaper --zoom $HOME/.config/herbstluftwm/themes/wallpaper.jpg
 
+export GTK_THEME=Adapta-Nokto:dark
+
 FOCUS='#17C431'
 
 hc attr theme.tiling.reset 1
