@@ -20,6 +20,7 @@ WIN=Mod4    # Windows Key is main modifyer
 ALT=Mod1    # ALT is 2nd modifyer, mainly for starting apps
 
 TERMINAL=alacritty
+BROWSER=brave-browser
 
 export GTK_THEME=Adapta-Nokto:dark
 
@@ -29,12 +30,21 @@ hc keybind $WIN-Escape close
 
 # applications
 hc keybind $WIN-Return spawn $TERMINAL
-#hc keybind $WIN-Return spawn "${TERMINAL:-alacritty}" # use your $TERMINAL with xterm as fallback
-hc keybind $WIN-$ALT-b spawn brave-browser &
-#hc keybind $WIN-$ALT-b spawn ~/.config/herbstluftwm/scripts/exec_on_tag.sh brave brave-browser 
+hc keybind $WIN-$ALT-b spawn $BROWSER &
+
+# Spotify - Music Player
 hc keybind $WIN-$ALT-s spawn spotify &
+
+# Settings Dialog
+hc keybind $WIN-$ALT-l spawn lxappearance
+
+# File Manager
 hc keybind $WIN-$ALT-n spawn nemo
-hc keybind $WIN-space spawn rofi -modi drun -show run
+
+hc keybind $WIN-$ALT-c spawn code ~/source/linux_stuff
+
+# Application launcher
+hc keybind $WIN-space spawn rofi -modi drun -show drun
  
 # basic movement in tiling and floating mode
 # focusing clients

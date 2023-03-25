@@ -3,3 +3,5 @@ XTerm*faceName: VeraMono
 XTerm*faceSize: 10
 XTerm*background: black
 XTerm*foreground: white
+ssh-askpass*faceName: VeraMono
+
