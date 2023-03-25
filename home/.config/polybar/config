@@ -72,7 +72,7 @@ font-1 = "FontAwesome:pixelsize=14;3"
 
 modules-left = info-hlwm-workspaces
 modules-center = weather date
-modules-right = cpu memory temperature volume wifi wired powermenu
+modules-right = cpu memory temperature pulseaudio wifi wired powermenu
  
 tray-detached = false
 tray-offset-x = 2
@@ -132,16 +132,6 @@ type = internal/memory
 interval = 3
 format = <label>
 label = RAM %gb_free%
-
-
-;==================== simpler volume module no slider
-[module/pavolume]
-type = internal/pulseaudio
-
-; Sink to be used, if it exists (find using `pacmd list-sinks`, name field)
-sink = alsa_output.pci-0000_0e_00.4.iec958-stereo
-use-ui-max = false
-interval = 5
 
 ;==================== Weather
 [module/weather]
@@ -265,9 +255,55 @@ time = " %H:%M"
 time-alt = " %H:%M:%S"
 
 format-prefix-foreground = ${colors.foreground-alt}
-format-underline = ${colors.primary}
+;format-underline = ${colors.primary}
 
 label = 📅%date% 🕑%time%
+
+
+[module/pulseaudio]
+type = internal/pulseaudio
+
+; Sink to be used, if it exists (find using `pacmd list-sinks`, name field)
+; If not, uses default sink
+; sink = alsa_output.pci-0000_12_00.3.analog-stereo
+
+; Use PA_VOLUME_UI_MAX (~153%) if true, or PA_VOLUME_NORM (100%) if false
+; Default: true
+use-ui-max = true
+
+; Interval for volume increase/decrease (in percent points)
+; Default: 5
+interval = 5
+; Available tags:
+;   <label-volume> (default)
+;   <ramp-volume>
+;   <bar-volume>
+format-volume = <ramp-volume> <label-volume>
+
+; Available tags:
+;   <label-muted> (default)
+;   <ramp-volume>
+;   <bar-volume>
+;format-muted = <label-muted>
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels%
+;label-volume = %percentage%%
+
+; Available tokens:
+;   %percentage% (default)
+;   %decibels%
+label-muted = 🔇 muted
+label-muted-foreground = #666
+
+; Only applies if <ramp-volume> is used
+ramp-volume-0 = 🔈
+ramp-volume-1 = 🔉
+ramp-volume-2 = 🔊
+
+; Right and Middle click
+click-right = pavucontrol
 
 [module/volume]
 type = internal/alsa
@@ -287,7 +323,7 @@ label-volume-foreground = ${root.foreground}
 
 format-muted-prefix = " "
 format-muted-foreground = ${colors.foreground-alt}
-label-muted =  sound muted
+label-muted = 🔇 sound muted
 
 bar-volume-width = 8
 bar-volume-foreground-0 = #55aa55
@@ -320,7 +356,7 @@ label-separator-foreground = ${colors.foreground-alt}
 menu-0-0 = reboot
 menu-0-0-exec = "sudo -A reboot"
 menu-0-1 = shutdown
-menu-0-1-exec = "sudo -A shutdown now"
+menu-0-1-exec = "sudo -A 6shutdown now"
 
 menu-1-0 = cancel
 menu-1-0-exec = menu-open-0
