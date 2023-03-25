@@ -65,15 +65,18 @@ You need to have the following packets installed:
 - lolcat
 - figlet
 - polybar
+- ssh-askpass
+- lxappearance
 
 # Font-Dependencies
 - Fira Code Font
+- font-awesome (free)
 - Noto Sans (preinstalled on linux Mint)
 - Noto Sans Symbols2 (preinstalled on linux Mint)
 - Noto Color Emoji (preinstalled on linux Mint)
 
 # Installation
-There is an installer script which is able to install the needed dependencies and installs the dotfiles.
+There is an installer script which is able to install the needed dependencies and to symlink the dotfiles.
 
 	./install
 
