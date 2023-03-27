@@ -9,19 +9,22 @@ it includes configuration for:
 
 ## bash
 - nice command aliases (like ll for ls -al  etc..)
+- 'nano' is alias for mirco
 - exa as ls replacement
 - console prompt "borrowed" from Kali Linux
 - colourful greeting message with neofetch figlet and lolcat
 - golang settings
 
 ## Midnight commander
-- editor setting (nano)
 - lynx-like motion enabled
 
 ## nano
 - line numbers
 - colors
 - syntax highlighting
+
+## micro
+- crisp high-contrast color scheme
 
 ## alacritty
 - dark classic high-contrast theme
@@ -56,17 +59,23 @@ in Tray:
 
 # Dependencies
 You need to have the following packets installed:
-- nano
-- mc (Midnight Commande)
-- neofetch
-- exa
-- herbstluftwm
-- alacritty
-- lolcat
-- figlet
-- polybar
-- ssh-askpass
-- lxappearance
+
+## Terminal 
+- nano - a lightweight console text editor wih syntax highlighting
+- mc (Midnight Commande) console mased file manager
+- neofetch - nice looking system info dislay
+- exa - ls in full color
+- lolcat - makes text rainbow-color
+- figlet - prints large text on console with ascii characters
+- micro editor (https://micro-editor.github.io/)
+
+## X/GUI/Graphical
+- herbstluftwm  - a nice tiling window manager
+- alacritty - hardware acelerated terminal emualator
+- polybar - the info bar and tray 
+- ssh-askpass - provides graphical password input for sudo
+- lxappearance - GTK-Theme Selection
+- pavucontrol - soundcard loudness setting dialog
 
 # Font-Dependencies
 - Fira Code Font
