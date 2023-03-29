@@ -1,0 +1,40 @@
+--- a/x.c	2023-03-29 13:10:57.676410271 +0200
++++ b/x.c	2023-03-29 13:18:06.214938180 +0200
+@@ -1,4 +1,3 @@
+-/* See LICENSE for license details. */
+ #include <errno.h>
+ #include <math.h>
+ #include <limits.h>
+@@ -253,7 +252,7 @@
+ static char *opt_line  = NULL;
+ static char *opt_name  = NULL;
+ static char *opt_title = NULL;
+-
++static int bellon = 0;    /* visual bell status */
+ static uint buttons; /* bit field of pressed buttons */
+ 
+ void
+@@ -1762,6 +1761,8 @@
+ 		xseturgency(1);
+ 	if (bellvolume)
+ 		XkbBell(xw.dpy, xw.win, bellvolume, (Atom)NULL);
++	if (!bellon) /* turn visual bell on */
++		bellon = 1;
+ }
+ 
+ void
+@@ -2010,7 +2011,13 @@
+ 			}
+ 		}
+ 
+-		draw();
++		if (bellon) {
++			bellon++;
++			bellon %= 3;
++			MODBIT(win.mode, !IS_SET(MODE_REVERSE), MODE_REVERSE);
++			redraw();
++		}
++		else draw();
+ 		XFlush(xw.dpy);
+ 		drawing = 0;
+ 	}
