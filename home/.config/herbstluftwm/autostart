@@ -21,6 +21,9 @@ ALT=Mod1    # ALT is 2nd modifyer, mainly for starting apps
 
 TERMINAL=alacritty
 BROWSER=brave-browser
+FILEMANAGER=nemo
+MUSICPLAYER=spotify
+SETTINGSDIALOG=lxappearance
 
 export GTK_THEME=Adapta-Nokto:dark
 
@@ -33,13 +36,13 @@ hc keybind $WIN-Return spawn $TERMINAL
 hc keybind $WIN-$ALT-b spawn $BROWSER &
 
 # Spotify - Music Player
-hc keybind $WIN-$ALT-s spawn spotify &
+hc keybind $WIN-$ALT-s spawn $MUSICPLAYER &
 
 # Settings Dialog
-hc keybind $WIN-$ALT-l spawn lxappearance
+hc keybind $WIN-$ALT-l spawn $SETTINGSDIALOG
 
 # File Manager
-hc keybind $WIN-$ALT-n spawn nemo
+hc keybind $WIN-$ALT-n spawn $FILEMANAGER
 
 hc keybind $WIN-$ALT-c spawn code &
 
@@ -151,6 +154,7 @@ hc rule class=Brave-browser tag=brave switchtag=on
 hc rule class=Spotify tag=spotify switchtag=on 
 hc rule class=Blueman-manager floating=on
 hc rule class=Pavucontrol floating=on
+hc rule class=FontMaker floating=on
 
 
 hc set tree_style '╾│ ├└╼─┐'

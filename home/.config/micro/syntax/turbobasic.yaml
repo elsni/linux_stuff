@@ -1,0 +1,35 @@
+filetype: Turbobasic
+
+detect: 
+    filename: "\\.(bas|lst|tur)$"
+
+rules:
+                    
+    - comment:
+        start: "\\'( |#)"
+        end: "$"
+        rules: []
+    
+    - statement: "(?i)\\b(\\?|PRINT|POKE|PEEK|OPEN|CLOSE|INPUT|BGET)\\b"
+    - statement: "(?i)\\b(FOR|NEXT|IF|THEN|ELSE|ENDIF|DATA|READ|RESTORE|DIM)\\b"
+    - statement: "(?i)\\b(WHILE|WEND|GOTO|REPEAT|UNTIL|WHILE|WEND|EXIT)\\b"
+    - statement: "(?i)\\b(DO|LOOP|PROC|EXEC|DPOKE|DPEEK|MOVE|-MOVE|BPUT|%PUT|%GET)\\b"
+    - statement: "(?i)\\b(GRAPHICS|TO|COLOR|PLOT|DRAWTO|MSET|PAUSE|SOUND|STICK|STRIG|RAND)\\b"
+    - symbol.operator: "(?i)\\b(AND|OR|NOT|MOD)\\b"
+    - constant.bool: "\\b(TRUE|FALSE)\\b"
+    - constant.number: "\\b([0-9]+)\\b"
+    - constant.number: "\\b(\\%[0-3])\\b"
+    - constant.number: "\\b(\\$[0-9A-Fa-f]+)\\b"
+    - symbol.brackets: "(\\(|\\))"
+    - symbol.brackets: "(\\[|\\])"
+    - symbol.operator: "([-+/*=<>|])"
+#    - identifier.var: '[a-zA-Z0-9_]*[\\$]?'
+    - constant.string:
+        start: "\""
+        end: "\""
+        skip: "\\\\."
+        rules:
+            - constant.specialChar: "\\\\."
+        
+    - indent-char.whitespace: "[[:space:]]+$"
+    - indent-char: "	+ +| +	+"
