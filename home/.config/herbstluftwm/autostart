@@ -35,13 +35,13 @@ xsetroot -solid $BACKGROUND
 # remove all existing keybindings
 hc keyunbind --all
 
-rm -f ../polybar/config
+rm -f ~/.config/polybar/config
 if [ "$SMALLSCREEN"=true ] ; then
-    cp ../polybar/config_small ../polybar/config
+    cp ~/.config/polybar/config_small ~/.config/polybar/config
 	$TITLEHEIGHT=0
 	$BARHEIGHT=20
 else
-    cp ../polybar/config_large ../polybar/config
+    cp ~/config/polybar/config_large ~/.config/polybar/config
 	$TITLEHEIGHT=20
 	$BARHEIGHT=32
 fi
