@@ -1,6 +1,26 @@
 #!/usr/bin/env bash
+#############################################################################################################
+# herbstluftwm autostart script
+#############################################################################################################
 
-# this is a simple config for herbstluftwm
+WIN=Mod4    # Windows Key is main modifyer
+ALT=Mod1    # ALT is 2nd modifyer, mainly for starting apps
+
+# set this to true if you want to save space
+# tested on 1024x600 netbook
+SMALLSCREEN=false
+
+TERMINAL=alacritty
+BROWSER=brave-browser
+FILEMANAGER=nemo
+MUSICPLAYER=spotify
+SETTINGSDIALOG=lxappearance
+
+# colors
+FOCUS='#17C431'
+BACKGROUND='#5A8E3A'
+
+#############################################################################################################
 
 hc() {
     herbstclient "$@"
@@ -8,22 +28,24 @@ hc() {
 
 hc emit_hook reload
 
-xsetroot -solid '#5A8E3A'
+xsetroot -solid $BACKGROUND
 
 #############################################################################################################
 # keybindings
 # remove all existing keybindings
 hc keyunbind --all
 
+rm -f ../polybar/config
+if [ "$SMALLSCREEN"=true ] ; then
+    cp ../polybar/config_small ../polybar/config
+	$TITLEHEIGHT=0
+	$BARHEIGHT=20
+else
+    cp ../polybar/config_large ../polybar/config
+	$TITLEHEIGHT=20
+	$BARHEIGHT=32
+fi
 
-WIN=Mod4    # Windows Key is main modifyer
-ALT=Mod1    # ALT is 2nd modifyer, mainly for starting apps
-
-TERMINAL=alacritty
-BROWSER=brave-browser
-FILEMANAGER=nemo
-MUSICPLAYER=spotify
-SETTINGSDIALOG=lxappearance
 
 export GTK_THEME=Adapta-Nokto:dark
 
@@ -177,7 +199,7 @@ fi
 hc detect_monitors
 
 # make room for polybar
-hc pad 0 32
+hc pad 0 $BARHEIGHT
 
 # don't use built-in panel
 # find the panel
@@ -193,7 +215,6 @@ hc pad 0 32
 
 export GTK_THEME=Adapta-Nokto:dark
 
-FOCUS='#17C431'
 
 hc attr theme.tiling.reset 1
 hc attr theme.floating.reset 1
@@ -209,7 +230,7 @@ hc set frame_gap 0
 hc set frame_active_opactiy 1
 hc set frame_normal_opacity 0
 
-hc attr theme.title_height 20
+hc attr theme.title_height $TITLEHEIGHT
 #hc attr theme.title_font 'Fira Code:pixelsize=12'  # example using Xft
 #hc attr theme.title_font 'Dejavu Sans Bold:pixelsize=12'  # example using Xft
 #hc attr theme.title_font '-*-fixed-bold-r-*-*-15-*-*-*-*-*-*-*'

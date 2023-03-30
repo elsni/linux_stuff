@@ -31,18 +31,25 @@ it includes configuration for:
 - Fira Code font
 
 ## herbstluftwm
+- configurable for small/large screens and different apps
 - green focus
 - polybar
 - switch off laptop screen when a monitor is connected to HDMI-1
-### important keybindings (not all are customized)
-	win-alt-s        open spotify
-	win-alt-b        open Brave Browser
+### important keybindings (some are herbstluft-default)
+	win-alt-s        open music player (i.e. spotify)
+	win-alt-b        open web browser
+	win-alt-n        open file browser (i.e. nemo)
 	win-Esc          close current window
     win-, and  win-. navigate through tags (workspaces)
 	win-arrows       move window focus to next window
 	win-shift-arrows move window
-    win-space        open launcher
+    win-space        open program launcher
     win-shift-q      logout
+
+### Configuration
+look at home/.config/herbstluftwm/autostart
+at the top of the file you can set some variables
+to your needs.
 
 ## Polybar
 - displays herbsluftwm workspaces
