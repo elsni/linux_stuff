@@ -36,7 +36,7 @@ xsetroot -solid $BACKGROUND
 hc keyunbind --all
 
 rm -f ~/.config/polybar/config
-if [ "$SMALLSCREEN"=true ] ; then
+if [ "$SMALLSCREEN" == "true" ] ; then
     cp ~/.config/polybar/config_small ~/.config/polybar/config
 	$TITLEHEIGHT=0
 	$BARHEIGHT=20
