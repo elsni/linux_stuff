@@ -38,12 +38,12 @@ hc keyunbind --all
 rm -f ~/.config/polybar/config
 if [ "$SMALLSCREEN" == "true" ] ; then
     cp ~/.config/polybar/config_small ~/.config/polybar/config
-	$TITLEHEIGHT=0
-	$BARHEIGHT=20
+	TITLEHEIGHT=0
+	BARHEIGHT=20
 else
-    cp ~/config/polybar/config_large ~/.config/polybar/config
-	$TITLEHEIGHT=20
-	$BARHEIGHT=32
+    cp ~/.config/polybar/config_large ~/.config/polybar/config
+	TITLEHEIGHT=20
+	BARHEIGHT=32
 fi
 
 
