@@ -14,6 +14,7 @@ TERMINAL=alacritty
 BROWSER=brave-browser
 FILEMANAGER=nemo
 MUSICPLAYER=spotify
+IDE=code
 SETTINGSDIALOG=lxappearance
 
 # colors
@@ -66,7 +67,7 @@ hc keybind $WIN-$ALT-l spawn $SETTINGSDIALOG
 # File Manager
 hc keybind $WIN-$ALT-n spawn $FILEMANAGER
 
-hc keybind $WIN-$ALT-c spawn code &
+hc keybind $WIN-$ALT-c spawn $IDE &
 
 # Application launcher
 hc keybind $WIN-space spawn rofi -modi drun -show drun
@@ -108,7 +109,7 @@ hc keybind $WIN-Control-Up      resize up +$resizestep
 hc keybind $WIN-Control-Right   resize right +$resizestep
 
 # tags
-tag_names=( {1..6} "code" "brave" "spotify" )
+tag_names=( {1..6} "code" "web" "music" )
 tag_keys=( {1..9} 0 )
 
 hc rename default "${tag_names[0]}" || true
@@ -172,11 +173,16 @@ hc rule windowtype='_NET_WM_WINDOW_TYPE_DIALOG' focus=on
 hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 
 hc rule class=Code tag=code switchtag=on
-hc rule class=Brave-browser tag=brave switchtag=on
-hc rule class=Spotify tag=spotify switchtag=on 
+hc rule class=Brave-browser tag=web switchtag=on
+hc rule class=Chrome tag=web switchtag=on
+hc rule class=Chromium tag=web switchtag=on
+hc rule class=Firefox tag=web switchtag=on
+hc rule class=Spotify tag=music switchtag=on 
+hv rule class=ncspot tag=music switchtag=on
 hc rule class=Blueman-manager floating=on
 hc rule class=Pavucontrol floating=on
 hc rule class=FontMaker floating=on
+hc rule class=Zzzfm floating=on
 
 
 hc set tree_style '╾│ ├└╼─┐'
@@ -185,7 +191,7 @@ hc set tree_style '╾│ ├└╼─┐'
 hc unlock
 
 #############################################################################################################
-# Screen Setup
+# Screen Setup[A]
 # check if HDMI-Display is present
 if xrandr -q | grep "HDMI-1 connected"; then
   xrandr --output eDP-1 --off    # Switch off Laptop display

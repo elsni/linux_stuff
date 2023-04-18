@@ -168,6 +168,9 @@ alias ifconfig="ip -c a"
 # for showing all mqtt messages
 alias mqtt="mosquitto_sub -v -h localhost -p 1883 -t '#'"
 
+# deactivate capslock key:
+xmodmap -e "keycode 66 ="
+
 # make SDL stop complaining about no mouse
 export SDL_NOMOUSE="1"
 
@@ -186,5 +189,5 @@ export NVM_DIR="$HOME/.nvm"
 
 export GOROOT="/usr/local/go"
 export GOPATH=$HOME/source/go
-export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH:~/zig
 
