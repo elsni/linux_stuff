@@ -120,7 +120,6 @@ export SUDO_ASKPASS=/usr/bin/ssh-askpass
 alias ll='exa -al'
 alias la='exa -a'
 alias l='exa -aF'
-alias nano='micro'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -168,8 +167,15 @@ alias ifconfig="ip -c a"
 # for showing all mqtt messages
 alias mqtt="mosquitto_sub -v -h localhost -p 1883 -t '#'"
 
-# deactivate capslock key:
-xmodmap -e "keycode 66 ="
+
+# Do X stuff only when we have an X display
+if xhost >& /dev/null; then
+  # deactivate capsloack key
+  xmodmap -e "keycode 66 ="
+  # this is temporary as long micro has problems with copy/paste over SSH sessions
+  # otherwise I would like to use micro over ssh sessions as well
+  alias nano='micro'
+fi
 
 # make SDL stop complaining about no mouse
 export SDL_NOMOUSE="1"

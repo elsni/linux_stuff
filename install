@@ -62,7 +62,7 @@ case "$1" in
     exit 0;;
   "-c")
     echo "installing console stuff..."
-    sudo apt install neofetch figlet lolcat exa mc nano -y
+    sudo apt install neofetch figlet lolcat exa mc nano micro -y
     install_dotfiles
     exit 0;;
   "-g")
@@ -73,7 +73,7 @@ case "$1" in
     exit 0;;
   "-a")
     echo "installing everything..."
-    sudo apt install neofetch figlet lolcat exa mc nano herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
+    sudo apt install neofetch figlet lolcat exa mc nano micro herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
     install_fira_font
     install_dotfiles
     exit 0;;
