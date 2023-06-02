@@ -2,6 +2,11 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+### Functions ###
+exec_if_exists() {
+	text -x $1 && $1
+}
+
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
@@ -197,3 +202,5 @@ export GOROOT="/usr/local/go"
 export GOPATH=$HOME/source/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH:~/zig
 
+# show local machine info if exists
+exec_if_exists ~/.machineinfo
