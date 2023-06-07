@@ -4,7 +4,7 @@
 
 ### Functions ###
 exec_if_exists() {
-	text -x $1 && $1
+	test -x $1 && $1
 }
 
 # If not running interactively, don't do anything
