@@ -203,3 +203,6 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH:~/zig
 
 # show local machine info if exists
 exec_if_exists ~/.machineinfo
+
+# Red block nonblinking cursor
+echo -e '\033[?112;0;64c'
