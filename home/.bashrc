@@ -139,7 +139,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
-export PATH="$HOME/bin:$HOME/.local/bin:/opt/gcc-eabi/bin:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:/opt/gcc-eabi/bin:/usr/games:$PATH"
 
 PATH="/home/elsni/perl5/bin${PATH:+:${PATH}}"; export PATH;
 PERL5LIB="/home/elsni/perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
@@ -190,7 +190,7 @@ export SDL_NOMOUSE="1"
 echo
 neofetch
 echo "Welcome to"
-hostname | figlet | /usr/games/lolcat
+hostname | figlet | lolcat
 
 
 export NVM_DIR="$HOME/.nvm"
