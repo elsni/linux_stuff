@@ -191,7 +191,7 @@ echo
 neofetch
 echo "Welcome to"
 hostname | figlet | lolcat
-
+echo
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
