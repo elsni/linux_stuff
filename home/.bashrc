@@ -86,6 +86,8 @@ if [ "$color_prompt" = yes ]; then
             PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}'$info_color'\u@\h\[\033[00m\]:'$prompt_color'\[\033[01m\]\w\[\033[00m\]\$ ';;
         backtrack)
             PS1='${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV)) }${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ ';;
+        block)
+            PS1='\n \[\033[0;34m\]╭─────\[\033[0;31m\]\[\033[0;37m\]\[\033[41m\] \u \[\033[0m\]\[\033[0;31m\]\[\033[0;34m\]─────\[\033[0;32m\]\[\033[0;30m\]\[\033[42m\] \w \[\033[0m\]\[\033[0;32m\] \n \[\033[0;34m\]╰ \[\033[1;36m\]\$ \[\033[0m\] ';;
    	esac
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
@@ -122,9 +124,9 @@ export GTK_THEME=Adapta-Nokto:dark
 export SUDO_ASKPASS=/usr/bin/ssh-askpass
 
 # some more ls aliases
-alias ll='exa -al'
-alias la='exa -a'
-alias l='exa -aF'
+alias ll='eza -al'
+alias la='eza -a'
+alias l='eza -aF'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
@@ -177,9 +179,6 @@ alias mqtt="mosquitto_sub -v -h localhost -p 1883 -t '#'"
 if xhost >& /dev/null; then
   # deactivate capsloack key
   xmodmap -e "keycode 66 ="
-  # this is temporary as long micro has problems with copy/paste over SSH sessions
-  # otherwise I would like to use micro over ssh sessions as well
-  alias nano='micro'
 fi
 
 # make SDL stop complaining about no mouse
