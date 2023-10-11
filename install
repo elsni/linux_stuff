@@ -20,7 +20,8 @@ create_safelink() {
 
 
 install_dotfiles() {
-  cd home/.config
+  mkdir "${HOME}/.config"
+  cd "${HOME}/.config"
 
   for d in */; do
     dir=${d::-1}  # remove ending slash
@@ -61,8 +62,8 @@ install_eza() {
 }
 
 install_lolcat() {
-  mkdir ~/source
-  cd ~/source
+  mkdir "${HOME]/source"
+  cd "${HOME]/source"
   git clone https://github.com/jaseg/lolcat.git
   cd lolcat
   make && sudo make install
@@ -75,7 +76,7 @@ install_lolcat() {
 
 case "$1" in
   "")
-    echo "Install Elsni's linux environment"
+    echo "Install Elsni's linux environment for debian based systems"
     echo "usage: install <OPTION>"
     echo "where OPTION can be:"
     echo "-c   install dotfiles and dependencies for a console-only system (server)"
