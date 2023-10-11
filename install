@@ -20,7 +20,7 @@ create_safelink() {
 
 
 install_dotfiles() {
-  mkdir "${HOME}/.config"
+  mkdir -p "${HOME}/.config"
   cd "${HOME}/.config"
 
   for d in */; do
@@ -62,8 +62,8 @@ install_eza() {
 }
 
 install_lolcat() {
-  mkdir "${HOME]/source"
-  cd "${HOME]/source"
+  mkdir -p "${HOME}/source"
+  cd "${HOME}/source"
   git clone https://github.com/jaseg/lolcat.git
   cd lolcat
   make && sudo make install
