@@ -135,9 +135,9 @@ alias lh='eza -dl .* --group-directories-first --time-style "+%d.%m.%y %H:%M"'
 # list everything with directories first including git status
 alias ll='eza -alg --group-directories-first --git --git-repos --time-style "+%d.%m.%y %H:%M"'
 # list only files sorted by size
-alias ls='eza -alF --color-always --sort-size --time-style "+%d.%m.%y %H:%M" | grep -v /'
+alias ls='eza -alF --color=always --sort=size --time-style "+%d.%m.%y %H:%M" | grep -v /'
 # list everything sorted by time updated
-alias lt='eza -alg --sort-modified --git --git-repos --time-style "+%d.%m.%y %H:%M"'
+alias lt='eza -alg --sort=modified --git --git-repos --time-style "+%d.%m.%y %H:%M"'
 
 # make aliases available for sudo
 alias sudo='sudo '
