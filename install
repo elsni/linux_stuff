@@ -15,13 +15,14 @@ create_safelink() {
     mv "$HOME/$1" "$HOME/$1_old" 2> /dev/null
   fi
   ## create a link to the config
+  echo $(get_abs_filename "$2")
   ln -s $(get_abs_filename "$2") "$HOME/$1"
 }
 
 
 install_dotfiles() {
   mkdir -p "${HOME}/.config"
-  cd "${HOME}/.config"
+  cd home/.config
 
   for d in */; do
     dir=${d::-1}  # remove ending slash

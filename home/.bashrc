@@ -109,7 +109,7 @@ esac
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='exa'
+    #alias ls='eza'
     alias dir='dir --color=auto'
     alias vdir='vdir --color=auto'
 
@@ -125,9 +125,22 @@ export GTK_THEME=Adapta-Nokto:dark
 export SUDO_ASKPASS=/usr/bin/ssh-askpass
 
 # some more ls aliases
-alias ll='eza -al'
-alias la='eza -a'
-alias l='eza -aF'
+
+# list only directories
+alias ld='eza -lD'
+# list only files
+alias lf='eza -lF --color=always | grep -v /'
+# list only hidden files
+alias lh='eza -dl .* --group-directories-first'
+# list everything with directories first including git status
+alias ll='eza -al --group-directories-first --git --git-repos --time-style "+%d.%m.%y %H:%M"'
+# list only files sorted by size
+alias ls='eza -alF --color-always --sort-size | grep -v /'
+# list everything sorted by time updated
+alias lt='eza -al --sort-modified'
+
+#alias la='eza -a'
+#alias l='eza -aF'
 
 # enable programmable completion features (you don't need to enable
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
