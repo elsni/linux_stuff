@@ -203,8 +203,7 @@ export SDL_NOMOUSE="1"
 # -------------------------------------------------------------------------------
 echo
 neofetch
-echo "Welcome to"
-hostname | figlet | lolcat
+echo "Welcome to `hostname`" | figlet -f future | lolcat
 echo
 
 export NVM_DIR="$HOME/.nvm"
