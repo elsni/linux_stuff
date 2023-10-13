@@ -62,6 +62,7 @@ install_eza() {
 }
 
 install_lolcat() {
+  olddir=`pwd`
   mkdir -p "${HOME}/source"
   cd "${HOME}/source"
   git clone https://github.com/jaseg/lolcat.git
@@ -69,7 +70,7 @@ install_lolcat() {
   make && sudo make install
   cd ..
   rm -rf lolcat
-  cd -
+  cd $olddir
 }
 
 # ---------------------- main ------------------------------------------
