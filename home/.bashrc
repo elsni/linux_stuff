@@ -127,17 +127,17 @@ export SUDO_ASKPASS=/usr/bin/ssh-askpass
 # some more ls aliases
 
 # list only directories
-alias ld='eza -lDg --time-style "+%d.%m.%y %H:%M"'
+alias ld='eza -lDg --time-style "long-iso"'
 # list only files
-alias lf='eza -lF --color=always --time-style "+%d.%m.%y %H:%M" | grep -v /'
+alias lf='eza -lF --color=always --time-style "long-iso" | grep -v /'
 # list only hidden files
-alias lh='eza -dl .* --group-directories-first --time-style "+%d.%m.%y %H:%M"'
+alias lh='eza -dl .* --group-directories-first --time-style "long-iso"'
 # list everything with directories first including git status
-alias ll='eza -alg --group-directories-first --git --git-repos --time-style "+%d.%m.%y %H:%M"'
+alias ll='eza -alg --group-directories-first --git --git-repos --time-style "long-iso"'
 # list only files sorted by size
-alias ls='eza -alF --color=always --sort=size --time-style "+%d.%m.%y %H:%M" | grep -v /'
+alias ls='eza -alF --color=always --sort=size --time-style "long-iso" | grep -v /'
 # list everything sorted by time updated
-alias lt='eza -alg --sort=modified --git --git-repos --time-style "+%d.%m.%y %H:%M"'
+alias lt='eza -alg --sort=modified --git --git-repos --time-style "long-iso"'
 
 # make aliases available for sudo
 alias sudo='sudo '
