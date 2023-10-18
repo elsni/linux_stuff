@@ -12,7 +12,7 @@ it includes configuration for:
 - 'nano' is alias for mirco
 - exa as ls replacement
 - console prompt "borrowed" from Kali Linux
-- colourful greeting message with neofetch figlet and lolcat
+- colourful greeting message with neofetch toilet and lolcat (alternative c version)
 - golang settings
 
 ## Midnight commander
@@ -31,10 +31,12 @@ it includes configuration for:
 - Fira Code font
 
 ## herbstluftwm
+- desktop background with all key bindings displayed
 - configurable for small/large screens and different apps
 - green focus
-- polybar
+- polybar with colourful icons, time and wather display
 - switch off laptop screen when a monitor is connected to HDMI-1
+
 ### important keybindings (some are herbstluft-default)
 	win-alt-s        open music player (i.e. spotify)
 	win-alt-b        open web browser
@@ -63,17 +65,19 @@ to your needs.
 in Tray:
 - blueman-applet (Bluetooth control)
 - nm-applet (wifi network connection management)
+these applets are not being installed, they need to be on the system (as they are in linux mint)
+
 
 # Dependencies
-You need to have the following packets installed:
+You need to have the following packets installed. The script installs them for you:
 
 ## Terminal 
 - nano - a lightweight console text editor wih syntax highlighting
 - mc (Midnight Commande) console mased file manager
 - neofetch - nice looking system info dislay
-- exa - ls in full color
-- lolcat - makes text rainbow-color
-- figlet - prints large text on console with ascii characters
+- eza - ls in full color
+- lolcat (c version) - makes text rainbow-color
+- toilet - prints large text on console with ascii characters
 - micro editor (https://micro-editor.github.io/)
 
 ## X/GUI/Graphical
@@ -100,6 +104,10 @@ without any parameters it prints the usage.
 
 The install script basically installs the dependencies on ubuntu/debian based systens and 
 renames old dotfiles and symlinks to the ones from this package.
-If you are not on a debian-based distro you need to install the deendencies yourself and invoke the installer with
+
+If you are not on a debian-based distro you need to install the dependencies yourself and invoke the installer with
 	./install -d
 to symlink the dotfiles only.
+
+enjoy!
+
