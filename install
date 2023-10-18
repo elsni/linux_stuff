@@ -69,7 +69,7 @@ install_lolcat() {
   cd lolcat
   make && sudo make install
   cd ..
-  rm -rf lolcat
+  #rm -rf lolcat
   cd $olddir
 }
 
@@ -90,20 +90,22 @@ case "$1" in
     exit 0;;
   "-c")
     echo "installing console stuff..."
-    sudo apt install neofetch toilet mc nano micro -y
+    sudo apt install build-essential neofetch toilet mc nano micro -y
     install_eza
     install_lolcat
     install_dotfiles
     exit 0;;
   "-g")
     echo "installing desktop stuff..."
-    sudo apt install herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
+    sudo apt install herbstluftwm polybar xterm xwallpaper fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
+	sudo apt install alacritty -y
     install_fira_font
     install_dotfiles
     exit 0;;
   "-a")
     echo "installing everything..."
-    sudo apt install neofetch toilet mc nano micro herbstluftwm polybar alacritty fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
+    sudo apt install build-essential xterm xwallpaper neofetch toilet mc nano micro herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
+	sudo apt install alacritty -y
     install_fira_font
     install_eza
     install_lolcat

@@ -57,8 +57,28 @@ hc keybind $WIN-Shift-r reload
 hc keybind $WIN-Escape close
 
 # applications
-hc keybind $WIN-Return spawn $TERMINAL
-hc keybind $WIN-$ALT-b spawn $BROWSER &
+
+
+if command -v xterm &> /dev/null
+then
+	hc keybind $WIN-Return spawn xterm
+fi
+
+if command -v $TERMINAL &> /dev/null
+then
+	hc keybind $WIN-Return spawn $TERMINAL
+fi
+
+# firefox-esr als fallback-browser
+if command -v firefox-esr &> /dev/null
+then
+	hc keybind $WIN-$ALT-b spawn firefox-esr &
+fi
+
+if command -v $BROWSER &> /dev/null
+then
+	hc keybind $WIN-$ALT-b spawn $BROWSER &
+fi
 
 # Spotify - Music Player
 hc keybind $WIN-$ALT-s spawn $MUSICPLAYER &
@@ -180,7 +200,7 @@ hc rule class=Chrome tag=web switchtag=on
 hc rule class=Chromium tag=web switchtag=on
 hc rule class=Firefox tag=web switchtag=on
 hc rule class=Spotify tag=music switchtag=on 
-hv rule class=ncspot tag=music switchtag=on
+hc rule class=ncspot tag=music switchtag=on
 hc rule class=Blueman-manager floating=on floatplacement=none floating_geometry=600x600-0+0
 hc rule class=Pavucontrol floating=on
 hc rule class=FontMaker floating=on
