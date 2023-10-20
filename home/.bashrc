@@ -129,15 +129,15 @@ export SUDO_ASKPASS=/usr/bin/ssh-askpass
 # list only directories
 alias ld='eza -lDg --time-style "long-iso"'
 # list only files
-alias lf='eza -lF --color=always --time-style "long-iso" | grep -v /'
+alias lf='eza -lF --color=always --icons --time-style "long-iso"'
 # list only hidden files
 alias lh='eza -dl .* --group-directories-first --time-style "long-iso"'
 # list everything with directories first including git status
-alias ll='eza -alg --group-directories-first --git --git-repos --time-style "long-iso"'
+alias ll='eza -alg --group-directories-first --icons --git --git-repos --time-style "long-iso"'
 # list only files sorted by size
-alias ls='eza -alF --color=always --sort=size --time-style "long-iso" | grep -v /'
+alias ls='eza -a --color=always --sort=size --group-directories-first --icons'
 # list everything sorted by time updated
-alias lt='eza -alg --sort=modified --git --git-repos --time-style "long-iso"'
+alias lt='eza -alg --sort=modified --git --git-repos --icons --time-style "long-iso"'
 
 # make aliases available for sudo
 alias sudo='sudo '
@@ -210,7 +210,17 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-export GOROOT="/usr/local/go"
+if [ -d "/usr/local/go" ]; then
+	# on debian based systems
+	export GOROOT="/usr/local/go"
+else
+	# on gentoo
+	if [ -d "/usr/lib/go" ]; then
+		export GOROOT="/usr/lib/go"
+	fi
+fi
+
+
 export GOPATH=$HOME/source/go
 export PATH=$GOPATH/bin:$GOROOT/bin:$PATH:~/zig
 
