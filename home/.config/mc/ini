@@ -82,7 +82,7 @@ editor_backup_extension=~
 editor_filesize_threshold=64M
 editor_stop_format_chars=-+*\\,.;:&>
 mcview_eof=
-skin=default
+skin=yadt256-defbg
 
 shadows=true
 
@@ -101,8 +101,8 @@ horizontal_equal=true
 top_panel_size=1
 
 [Misc]
-timeformat_recent=%b %e %H:%M
-timeformat_old=%b %e  %Y
+timeformat_recent=%d.%m.%y %H:%M
+timeformat_old=%d.%m.%y %H:%M
 ftp_proxy_host=gate
 ftpfs_password=anonymous@
 display_codepage=UTF-8
