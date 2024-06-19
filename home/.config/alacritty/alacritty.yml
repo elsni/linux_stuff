@@ -248,7 +248,7 @@ schemes:
       white:   '#ffffff'
 
   ### Elsni ###
-  DoomOne: &Elsni
+  Elsni: &Elsni
     primary:
       background: '#000000'
       foreground: '#ffffff'
