@@ -1,113 +1,104 @@
 # linux_stuff
 
-Here you find my setup files (dotfile) for a linux environment
-of my personal taste.
-It works with debian based distros such as:
-Debian,(K/L)Ubuntu, Bunsenlabs, DietPi, Raspi OS, Mint ...
+This repository contains my personal Linux dotfiles and a small installer that
+symlinks them into `$HOME` and (optionally) installs required packages.
 
-it includes configuration for:
+It supports:
+- Debian/Ubuntu/Mint and other **apt-based** distros via `./install`
+- **Gentoo** via `./install_gentoo`
 
-## bash
-- nice command aliases (like ll for ls -al  etc..)
-- 'nano' is alias for mirco
-- exa as ls replacement
-- console prompt "borrowed" from Kali Linux
-- colourful greeting message with neofetch toilet and lolcat (alternative c version)
-- golang settings
+---
 
-## Midnight commander
+## What’s included
+
+### bash
+- aliases (e.g. `ll` for `ls -al`)
+- `nano` is aliased to `micro`
+- `eza` as `ls` replacement
+- console prompt inspired by Kali Linux
+- colourful greeting using `neofetch`, `toilet`, `lolcat`
+- Go environment settings
+
+### Midnight Commander (mc)
 - lynx-like motion enabled
 
-## nano
+### nano
 - line numbers
-- colors
+- colours
 - syntax highlighting
 
-## micro
-- crisp high-contrast color scheme
+### micro
+- crisp high-contrast colour scheme
 
-## alacritty
+### alacritty
 - dark classic high-contrast theme
 - Fira Code font
 
-## herbstluftwm
-- desktop background with all key bindings displayed
+### herbstluftwm
+- desktop background with key bindings displayed
 - configurable for small/large screens and different apps
 - green focus
-- polybar with colourful icons, time and wather display
+- polybar with colourful icons, time and weather display
 - switch off laptop screen when a monitor is connected to HDMI-1
 
-### important keybindings (some are herbstluft-default)
-	win-alt-s        open music player (i.e. spotify)
-	win-alt-b        open web browser
-	win-alt-n        open file browser (i.e. nemo)
-	win-Esc          close current window
-    win-, and  win-. navigate through tags (workspaces)
-	win-arrows       move window focus to next window
-	win-shift-arrows move window
-    win-space        open program launcher
-    win-shift-q      logout
+#### Important keybindings (some are herbstluftwm defaults)
+    win-alt-s           open music player (e.g. spotify)
+    win-alt-b           open web browser
+    win-alt-n           open file browser (e.g. nemo)
+    win-Esc             close current window
+    win-, / win-.        navigate through tags (workspaces)
+    win-arrows          move focus
+    win-shift-arrows    move window
+    win-space           open program launcher
+    win-shift-q         logout
 
-### Configuration
-look at home/.config/herbstluftwm/autostart
-at the top of the file you can set some variables
-to your needs.
+#### Configuration
+See `home/.config/herbstluftwm/autostart` (variables at the top).
 
-## Polybar
-- displays herbsluftwm workspaces
-- displays weather for Lübeck/Germany
-- displays local date/time
-- displays CPU-load, free RAM and core Temp.
-- displays current audio level
-- displays current IP
-- Power-Off/logout button
+### Polybar
+- herbstluftwm workspaces
+- weather (Lübeck, Germany)
+- local date/time
+- CPU load, free RAM, core temperature
+- audio level
+- current IP
+- power-off/logout button
 
-in Tray:
-- blueman-applet (Bluetooth control)
-- nm-applet (wifi network connection management)
-these applets are not being installed, they need to be on the system (as they are in linux mint)
+Tray applets (not installed by the scripts):
+- `blueman-applet` (Bluetooth control)
+- `nm-applet` (Wi-Fi network management)
 
+---
 
-# Dependencies
-You need to have the following packets installed. The script installs them for you:
+## Dependencies
 
-## Terminal 
-- nano - a lightweight console text editor wih syntax highlighting
-- mc (Midnight Commande) console mased file manager
-- neofetch - nice looking system info dislay
-- eza - ls in full color
-- lolcat (c version) - makes text rainbow-color
-- toilet - prints large text on console with ascii characters
-- micro editor (https://micro-editor.github.io/)
+The exact dependency set depends on the target system and install mode.
+Both installer scripts can print their dependency list:
 
-## X/GUI/Graphical
-- herbstluftwm  - a nice tiling window manager
-- alacritty - hardware acelerated terminal emualator
-- polybar - the info bar and tray 
-- ssh-askpass - provides graphical password input for sudo
-- lxappearance - GTK-Theme Selection
-- pavucontrol - soundcard loudness setting dialog
+- apt-based distros:
+  - `./install -p`
+- Gentoo:
+  - `./install_gentoo -p`
 
-# Font-Dependencies
-- Fira Code Font
-- font-awesome (free)
-- Noto Sans (preinstalled on linux Mint)
-- Noto Sans Symbols2 (preinstalled on linux Mint)
-- Noto Color Emoji (preinstalled on linux Mint)
+Note: On Gentoo, `micro` (and `lolcat`) may require `~amd64` keywords; `install_gentoo`
+handles this automatically on amd64.
 
-# Installation
-There is an installer script which is able to install the needed dependencies and to symlink the dotfiles.
+---
 
-	./install
+## Installation
 
-without any parameters it prints the usage.
+### apt-based distros (Debian/Ubuntu/Mint)
+Run:
+    ./install
 
-The install script basically installs the dependencies on ubuntu/debian based systens and 
-renames old dotfiles and symlinks to the ones from this package.
+It prints usage and the available modes.
 
-If you are not on a debian-based distro you need to install the dependencies yourself and invoke the installer with
-	./install -d
-to symlink the dotfiles only.
+### Gentoo
+Run:
+    ./install_gentoo
 
-enjoy!
+It prints usage and the available modes.
 
+Both installers:
+- back up existing dotfiles by renaming them with a timestamp suffix
+- create symlinks from this repository into your `$HOME`

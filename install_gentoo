@@ -1,0 +1,217 @@
+#!/bin/bash
+# Installer script for elsni's linux environment (Gentoo edition)
+# (w) 2023 by Stephan Elsner
+
+set -euo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_HOME_DIR="${SCRIPT_DIR}/home"
+REPO_CONFIG_DIR="${REPO_HOME_DIR}/.config"
+
+CONSOLE_PKGS=(
+  sys-devel/gcc
+  sys-devel/make
+  sys-devel/binutils
+  dev-vcs/git
+  net-misc/curl
+  app-arch/unzip
+  app-misc/ca-certificates
+  app-misc/neofetch
+  app-misc/toilet
+  app-misc/mc
+  app-editors/nano
+  app-editors/micro
+  sys-apps/eza
+  games-misc/lolcat
+)
+
+GUI_PKGS=(
+  x11-wm/herbstluftwm
+  x11-misc/polybar
+  x11-terms/xterm
+  x11-misc/xwallpaper
+  media-fonts/noto
+  media-fonts/noto-emoji
+  media-fonts/fontawesome
+  net-misc/x11-ssh-askpass
+  x11-misc/rofi
+  lxde-base/lxappearance
+  x11-terms/alacritty
+  media-fonts/fira-code
+)
+
+die() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+require_gentoo() {
+  if [[ -f /etc/os-release ]]; then
+    # shellcheck disable=SC1091
+    . /etc/os-release
+    [[ "${ID:-}" == "gentoo" ]] || die "This installer is for Gentoo only (detected ID='${ID:-unknown}')."
+    return
+  fi
+
+  [[ -f /etc/gentoo-release ]] || die "This installer is for Gentoo only (could not detect Gentoo)."
+}
+
+run_root() {
+  if [[ "${EUID}" -eq 0 ]]; then
+    "$@"
+  else
+    sudo "$@"
+  fi
+}
+
+arch_keyword() {
+  if command -v portageq >/dev/null 2>&1; then
+    portageq envvar ARCH 2>/dev/null || true
+  else
+    case "$(uname -m)" in
+      x86_64) echo "amd64" ;;
+      aarch64) echo "arm64" ;;
+      *) echo "" ;;
+    esac
+  fi
+}
+
+ensure_accept_keyword() {
+  local atom="$1"
+  local kw="$2"
+
+  local target=""
+  if [[ -d /etc/portage/package.accept_keywords ]]; then
+    target="/etc/portage/package.accept_keywords/elsni-env"
+  elif [[ -f /etc/portage/package.accept_keywords ]]; then
+    target="/etc/portage/package.accept_keywords"
+  else
+    run_root mkdir -p /etc/portage/package.accept_keywords
+    target="/etc/portage/package.accept_keywords/elsni-env"
+  fi
+
+  if run_root test -f "$target" && run_root grep -qE "^[[:space:]]*${atom}[[:space:]]+${kw}[[:space:]]*$" "$target"; then
+    return 0
+  fi
+
+  if [[ "${EUID}" -eq 0 ]]; then
+    echo "${atom} ${kw}" >> "$target"
+  else
+    echo "${atom} ${kw}" | sudo tee -a "$target" >/dev/null
+  fi
+}
+
+create_safelink() {
+  local dest_rel="$1"
+  local src_abs="$2"
+  local dest="${HOME}/${dest_rel}"
+
+  run_root true >/dev/null 2>&1 || true
+
+  if [[ -L "$dest" ]]; then
+    rm -f "$dest"
+  elif [[ -e "$dest" ]]; then
+    local ts
+    ts="$(date +%Y%m%d_%H%M%S)"
+    mv "$dest" "${dest}_old_${ts}"
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+  ln -s "$src_abs" "$dest"
+}
+
+install_dotfiles() {
+  mkdir -p "${HOME}/.config"
+
+  if [[ ! -d "$REPO_CONFIG_DIR" ]]; then
+    die "Missing directory: ${REPO_CONFIG_DIR}"
+  fi
+
+  shopt -s nullglob
+  for d in "${REPO_CONFIG_DIR}"/*/; do
+    local dir
+    dir="$(basename "${d%/}")"
+    create_safelink ".config/${dir}" "${d%/}"
+  done
+  shopt -u nullglob
+
+  for f in ".bashrc" ".Xresources" ".Xdefaults"; do
+    if [[ -e "${REPO_HOME_DIR}/${f}" ]]; then
+      create_safelink "${f}" "${REPO_HOME_DIR}/${f}"
+    fi
+  done
+}
+
+install_console() {
+  local arch
+  arch="$(arch_keyword)"
+
+  if [[ "$arch" == "amd64" ]]; then
+    ensure_accept_keyword "app-editors/micro" "~amd64"
+    ensure_accept_keyword "games-misc/lolcat" "~amd64"
+  fi
+
+  run_root emerge --ask=n "${CONSOLE_PKGS[@]}"
+}
+
+install_gui() {
+  run_root emerge --ask=n "${GUI_PKGS[@]}"
+
+  if command -v fc-cache >/dev/null 2>&1; then
+    fc-cache -f >/dev/null 2>&1 || true
+  fi
+}
+
+print_deps() {
+  echo "Console packages:"
+  printf "  %s\n" "${CONSOLE_PKGS[@]}"
+  echo
+  echo "GUI packages:"
+  printf "  %s\n" "${GUI_PKGS[@]}"
+  echo
+  echo "Notes:"
+  echo "  app-editors/micro is ~amd64 on Gentoo (script auto-enables this on amd64 for -c / -a)."
+  echo "  games-misc/lolcat is ~amd64 on Gentoo (script auto-enables this on amd64 for -c / -a)."
+}
+
+# ---------------------- main ------------------------------------------
+
+require_gentoo
+
+case "${1:-}" in
+  "")
+    echo "Install Elsni's linux environment (Gentoo edition)"
+    echo "usage: install-gentoo.sh <OPTION>"
+    echo "where OPTION can be:"
+    echo "-c   install console dependencies and dotfiles"
+    echo "-g   install gui dependencies and dotfiles"
+    echo "-a   install everything (console + gui) and dotfiles"
+    echo "-d   install dotfiles only"
+    echo "-p   print package atoms (no install)"
+    exit 0
+    ;;
+  "-c")
+    install_console
+    install_dotfiles
+    ;;
+  "-g")
+    install_gui
+    install_dotfiles
+    ;;
+  "-a")
+    install_console
+    install_gui
+    install_dotfiles
+    ;;
+  "-d")
+    install_dotfiles
+    ;;
+  "-p")
+    print_deps
+    ;;
+  *)
+    echo "wrong parameter"
+    exit 1
+    ;;
+esac

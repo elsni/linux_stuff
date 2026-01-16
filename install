@@ -1,121 +1,250 @@
 #!/bin/bash
-# Installer script for elsni's linux environment
+# Installer script for elsni's linux environment (Ubuntu / Linux Mint)
 # (w) 2023 by Stephan Elsner
 
-get_abs_filename() {
-  # $1 : relative filename
-  echo "$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+set -euo pipefail
+IFS=$'\n\t'
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+die() {
+  echo "ERROR: $*" >&2
+  exit 1
+}
+
+is_apt_system() {
+  command -v apt >/dev/null 2>&1
+}
+
+abs_path() {
+  # Returns an absolute path for an existing file/dir (best effort).
+  # On Ubuntu/Mint, readlink -f is available.
+  local p="$1"
+  readlink -f -- "$p"
 }
 
 create_safelink() {
-  if [[ -L "$HOME/$1" ]]; then     # check if dir is a symlink
-    rm "$HOME/$1"
-  else
-    # no, rename old dir
-    mv "$HOME/$1" "$HOME/$1_old" 2> /dev/null
+  # Creates a symlink at $HOME/<dest_rel> pointing to <src_abs>.
+  # If an existing item is present at the destination:
+  # - if it is a symlink: remove it
+  # - otherwise: move it aside with a timestamp suffix
+  local dest_rel="$1"
+  local src_in="$2"
+
+  local dest="${HOME}/${dest_rel}"
+  local src
+  src="$(abs_path "$src_in")"
+
+  if [[ -z "$src" || ! -e "$src" ]]; then
+    die "Source does not exist: $src_in"
   fi
-  ## create a link to the config
-  ln -s $(get_abs_filename "$2") "$HOME/$1"
+
+  if [[ -L "$dest" ]]; then
+    rm -f -- "$dest"
+  elif [[ -e "$dest" ]]; then
+    local ts
+    ts="$(date +%Y%m%d_%H%M%S)"
+    mv -- "$dest" "${dest}_old_${ts}"
+  fi
+
+  mkdir -p -- "$(dirname -- "$dest")"
+  ln -s -- "$src" "$dest"
 }
 
-
 install_dotfiles() {
-  mkdir -p "${HOME}/.config"
-  cd home/.config
+  # Installs dotfiles and ~/.config entries by creating symlinks into the repo.
+  local repo_home="${SCRIPT_DIR}/home"
+  local repo_cfg="${repo_home}/.config"
 
-  for d in */; do
-    dir=${d::-1}  # remove ending slash
-    create_safelink ".config/$dir" "$dir"
+  [[ -d "$repo_home" ]] || die "Expected directory not found: $repo_home"
+  [[ -d "$repo_cfg" ]] || die "Expected directory not found: $repo_cfg"
+
+  mkdir -p "${HOME}/.config"
+
+  # Link each directory under home/.config/<name> -> ~/.config/<name>
+  local d
+  for d in "${repo_cfg}"/*/; do
+    [[ -d "$d" ]] || continue
+    local name
+    name="$(basename -- "${d%/}")"
+    create_safelink ".config/${name}" "$d"
   done
 
-  cd ..
-  create_safelink ".bashrc" ".bashrc"
-  create_safelink ".Xresources" ".Xresources"
-  create_safelink ".Xdefaults" ".Xdefaults"
+  # Link selected dotfiles from home/ -> ~/
+  create_safelink ".bashrc"     "${repo_home}/.bashrc"
+  create_safelink ".Xresources" "${repo_home}/.Xresources"
+  create_safelink ".Xdefaults"  "${repo_home}/.Xdefaults"
 }
 
 install_fira_font() {
-  fonts_dir="${HOME}/.local/share/fonts"
-  if [ ! -d "${fonts_dir}" ]; then
-    mkdir -p "${fonts_dir}"
-  fi
-  echo "downloading Fira code..."
-  version=5.2
-  zip=Fira_Code_v${version}.zip
-  curl --fail --location --show-error https://github.com/tonsky/FiraCode/releases/download/${version}/${zip} --output ${zip}
-  unzip -o -q -d ${fonts_dir} ${zip}
-  rm ${zip}
+  # Downloads and installs Fira Code into ~/.local/share/fonts and rebuilds font cache.
+  local fonts_dir="${HOME}/.local/share/fonts"
+  local version="5.2"
+  local zip="Fira_Code_v${version}.zip"
+
+  mkdir -p "${fonts_dir}"
+
+  echo "downloading Fira Code..."
+  curl --fail --location --show-error \
+    "https://github.com/tonsky/FiraCode/releases/download/${version}/${zip}" \
+    --output "${zip}"
+
+  unzip -o -q -d "${fonts_dir}" "${zip}"
+  rm -f -- "${zip}"
+
   echo "rebuilding font cache..."
   fc-cache -f
 }
 
 install_eza() {
+  # Installs eza via the upstream deb repository.
   sudo apt install -y gpg wget
   sudo mkdir -p /etc/apt/keyrings
+
   if [ ! -f "/etc/apt/keyrings/gierens.gpg" ]; then
-    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+    wget -qO- "https://raw.githubusercontent.com/eza-community/eza/main/deb.asc" \
+      | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+
+    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] https://deb.gierens.de stable main" \
+      | sudo tee /etc/apt/sources.list.d/gierens.list >/dev/null
+
     sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
   fi
+
   sudo apt update
   sudo apt install -y eza
 }
 
 install_lolcat() {
-  olddir=`pwd`
+  # Builds and installs lolcat from source (idempotent: clone or pull).
+  local olddir
+  olddir="$(pwd)"
+
   mkdir -p "${HOME}/source"
   cd "${HOME}/source"
-  git clone https://github.com/jaseg/lolcat.git
-  cd lolcat
-  make && sudo make install
-  cd ..
-  #rm -rf lolcat
-  cd $olddir
+
+  if [[ -d "lolcat/.git" ]]; then
+    cd "lolcat"
+    git pull --ff-only
+  else
+    git clone "https://github.com/jaseg/lolcat.git"
+    cd "lolcat"
+  fi
+
+  make
+  sudo make install
+
+  cd "${olddir}"
+}
+
+print_dependencies() {
+  # Prints dependency list for non-apt systems (best-effort package names).
+  cat <<'EOF'
+Dependencies used by this installer (grouped):
+
+Base tools (console):
+- build tools: build-essential (gcc/g++/make), make
+- git
+- curl
+- wget
+- gpg
+- unzip
+- ca-certificates
+- fontconfig (for fc-cache)
+- neofetch
+- toilet
+- mc
+- nano
+- micro
+
+Desktop (GUI):
+- herbstluftwm
+- polybar
+- xterm
+- xwallpaper
+- fonts-noto
+- fonts-noto-color-emoji
+- fonts-font-awesome
+- ssh-askpass
+- rofi
+- lxappearance
+- alacritty
+
+Additional installs performed by the script:
+- Fira Code font (downloaded ZIP from GitHub release, installed into ~/.local/share/fonts)
+- eza (via deb repo on apt systems)
+- lolcat (built from source via git clone + make + sudo make install)
+EOF
+}
+
+usage() {
+  echo "Install Elsni's linux environment for debian based systems"
+  echo "usage: install.sh <OPTION>"
+  echo "where OPTION can be:"
+  echo "-c   install dotfiles and dependencies for a console-only system (server)"
+  echo "-g   install dependencies and dotfiles for a desktop (gui) system"
+  echo "-a   install both, console and desktop stuff"
+  echo "-d   install dotfiles only, don't install any dependencies"
+  echo "-p   print dependencies (useful on non-apt systems)"
+  echo
+  echo "IMPORTANT: -c -g -a only works on systems with apt package manager"
+  echo "like debian, ubuntu, mint, bunsenlabs, dietpi ..."
 }
 
 # ---------------------- main ------------------------------------------
 
-case "$1" in
+case "${1:-}" in
   "")
-    echo "Install Elsni's linux environment for debian based systems"
-    echo "usage: install <OPTION>"
-    echo "where OPTION can be:"
-    echo "-c   install dotfiles and dependencies for a console-only system (server)"
-    echo "-g   install dependencies and dotfiles for a desktop (gui) system"
-    echo "-a   install both, console and desktop stuff."
-    echo "-d   install dotfiles only, don't install any dependencies"
-    echo
-    echo "IMPORTANT: -c -g -a only works on systems with apt package manager"
-    echo "like debian, ubuntu, mint, bunsenlabs, dietpi ..."
-    exit 0;;
+    usage
+    exit 0
+    ;;
+  "-p")
+    print_dependencies
+    exit 0
+    ;;
   "-c")
+    is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing console stuff..."
-    sudo apt install build-essential neofetch toilet mc nano micro -y
+    sudo apt update
+    sudo apt install -y build-essential git curl unzip ca-certificates neofetch toilet mc nano micro
     install_eza
     install_lolcat
     install_dotfiles
-    exit 0;;
+    exit 0
+    ;;
   "-g")
+    is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing desktop stuff..."
-    sudo apt install herbstluftwm polybar xterm xwallpaper fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
-	sudo apt install alacritty -y
+    sudo apt update
+    sudo apt install -y curl unzip fontconfig ca-certificates \
+      herbstluftwm polybar xterm xwallpaper fonts-noto fonts-noto-color-emoji \
+      fonts-font-awesome ssh-askpass rofi lxappearance alacritty
     install_fira_font
     install_dotfiles
-    exit 0;;
+    exit 0
+    ;;
   "-a")
+    is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing everything..."
-    sudo apt install build-essential xterm xwallpaper neofetch toilet mc nano micro herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome ssh-askpass rofi lxappearance -y
-	sudo apt install alacritty -y
+    sudo apt update
+    sudo apt install -y build-essential git curl unzip fontconfig ca-certificates \
+      xterm xwallpaper neofetch toilet mc nano micro \
+      herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome \
+      ssh-askpass rofi lxappearance alacritty
     install_fira_font
     install_eza
     install_lolcat
     install_dotfiles
-    exit 0;;
+    exit 0
+    ;;
   "-d")
     echo "installing dotfiles only..."
     install_dotfiles
-    exit 0;;
+    exit 0
+    ;;
   *)
     echo "wrong parameter"
-    exit 1;;
+    usage
+    exit 1
+    ;;
 esac
