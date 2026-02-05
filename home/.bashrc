@@ -201,7 +201,7 @@ export SDL_NOMOUSE="1"
 # Message to show on login
 # -------------------------------------------------------------------------------
 echo
-neofetch
+fastfetch
 echo "Welcome to $(hostname)" | toilet -f future | lolcat
 echo
 
@@ -235,4 +235,3 @@ export PATH=$GOPATH/bin:$GOROOT/bin:$PATH:~/zig:~/appimages
 # show local machine info if exists
 exec_if_exists ~/.machineinfo
 
-source /home/elsni/.bash_completions/nala.sh

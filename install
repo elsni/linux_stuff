@@ -79,14 +79,13 @@ install_dotfiles() {
 install_fira_font() {
   # Downloads and installs Fira Code into ~/.local/share/fonts and rebuilds font cache.
   local fonts_dir="${HOME}/.local/share/fonts"
-  local version="5.2"
-  local zip="Fira_Code_v${version}.zip"
+  local zip="Fira_Code.zip"
 
   mkdir -p "${fonts_dir}"
-
+# https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip
   echo "downloading Fira Code..."
   curl --fail --location --show-error \
-    "https://github.com/tonsky/FiraCode/releases/download/${version}/${zip}" \
+    "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip" \
     --output "${zip}"
 
   unzip -o -q -d "${fonts_dir}" "${zip}"
@@ -151,11 +150,12 @@ Base tools (console):
 - unzip
 - ca-certificates
 - fontconfig (for fc-cache)
-- neofetch
+- fastfetch
 - toilet
 - mc
 - nano
 - micro
+- nala (.deb systems only)
 
 Desktop (GUI):
 - herbstluftwm
@@ -182,7 +182,8 @@ usage() {
   echo "usage: install.sh <OPTION>"
   echo "where OPTION can be:"
   echo "-c   install dotfiles and dependencies for a console-only system (server)"
-  echo "-g   install dependencies and dotfiles for a desktop (gui) system"
+  echo "-g   install dependencies and dotfiles for a desktop (gui) system including Fonts and Herbstluftwm"
+  echo "-k   install dependencies and dotfiles for terminal on a desktop system (like -c + Fonts)"
   echo "-a   install both, console and desktop stuff"
   echo "-d   install dotfiles only, don't install any dependencies"
   echo "-p   print dependencies (useful on non-apt systems)"
@@ -206,7 +207,7 @@ case "${1:-}" in
     is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing console stuff..."
     sudo apt update
-    sudo apt install -y build-essential git curl unzip ca-certificates neofetch toilet mc nano micro
+    sudo apt install -y build-essential git curl unzip ca-certificates fastfetch toilet mc nano micro nala
     install_eza
     install_lolcat
     install_dotfiles
@@ -223,12 +224,24 @@ case "${1:-}" in
     install_dotfiles
     exit 0
     ;;
+  "-k")
+    is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
+    echo "installing terminal on desktop stuff..."
+    sudo apt update
+    sudo apt install -y build-essential git curl unzip ca-certificates fastfetch toilet mc nano micro nala
+    sudo apt install -y curl unzip fontconfig ca-certificates \
+      fonts-noto fonts-noto-color-emoji \
+      fonts-font-awesome 
+    install_fira_font
+    install_dotfiles
+    exit 0
+    ;;    
   "-a")
     is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing everything..."
     sudo apt update
     sudo apt install -y build-essential git curl unzip fontconfig ca-certificates \
-      xterm xwallpaper neofetch toilet mc nano micro \
+      xterm xwallpaper fastfetch toilet mc nano micro nala \
       herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome \
       ssh-askpass rofi lxappearance alacritty
     install_fira_font
