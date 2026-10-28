@@ -6,6 +6,8 @@ set -euo pipefail
 IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=tools/install_helpers.sh
+source "${SCRIPT_DIR}/tools/install_helpers.sh"
 REPO_HOME_DIR="${SCRIPT_DIR}/home"
 REPO_CONFIG_DIR="${REPO_HOME_DIR}/.config"
 
@@ -17,7 +19,7 @@ CONSOLE_PKGS=(
   net-misc/curl
   app-arch/unzip
   app-misc/ca-certificates
-  app-misc/neofetch
+  app-misc/fastfetch
   app-misc/toilet
   app-misc/mc
   app-editors/nano
@@ -41,11 +43,13 @@ GUI_PKGS=(
   media-fonts/fira-code
 )
 
+# Report an error and stop the installer.
 die() {
   echo "ERROR: $*" >&2
   exit 1
 }
 
+# Reject execution on systems other than Gentoo.
 require_gentoo() {
   if [[ -f /etc/os-release ]]; then
     # shellcheck disable=SC1091
@@ -57,6 +61,7 @@ require_gentoo() {
   [[ -f /etc/gentoo-release ]] || die "This installer is for Gentoo only (could not detect Gentoo)."
 }
 
+# Run a command as root using sudo when necessary.
 run_root() {
   if [[ "${EUID}" -eq 0 ]]; then
     "$@"
@@ -65,6 +70,7 @@ run_root() {
   fi
 }
 
+# Read the architecture used for Gentoo package keywords.
 arch_keyword() {
   if command -v portageq >/dev/null 2>&1; then
     portageq envvar ARCH 2>/dev/null || true
@@ -77,6 +83,7 @@ arch_keyword() {
   fi
 }
 
+# Add a package keyword when it is not already present.
 ensure_accept_keyword() {
   local atom="$1"
   local kw="$2"
@@ -102,25 +109,23 @@ ensure_accept_keyword() {
   fi
 }
 
+# Back up an existing destination and link the repository source.
 create_safelink() {
   local dest_rel="$1"
   local src_abs="$2"
   local dest="${HOME}/${dest_rel}"
 
-  run_root true >/dev/null 2>&1 || true
-
   if [[ -L "$dest" ]]; then
     rm -f "$dest"
   elif [[ -e "$dest" ]]; then
-    local ts
-    ts="$(date +%Y%m%d_%H%M%S)"
-    mv "$dest" "${dest}_old_${ts}"
+    backup_existing "$dest"
   fi
 
   mkdir -p "$(dirname "$dest")"
   ln -s "$src_abs" "$dest"
 }
 
+# Link repository dotfiles into the current user home.
 install_dotfiles() {
   mkdir -p "${HOME}/.config"
 
@@ -143,6 +148,7 @@ install_dotfiles() {
   done
 }
 
+# Install console packages and required Gentoo keywords.
 install_console() {
   local arch
   arch="$(arch_keyword)"
@@ -155,6 +161,7 @@ install_console() {
   run_root emerge --ask=n "${CONSOLE_PKGS[@]}"
 }
 
+# Install desktop packages and refresh the font cache.
 install_gui() {
   run_root emerge --ask=n "${GUI_PKGS[@]}"
 
@@ -163,6 +170,7 @@ install_gui() {
   fi
 }
 
+# Print the Gentoo package atoms used by this installer.
 print_deps() {
   echo "Console packages:"
   printf "  %s\n" "${CONSOLE_PKGS[@]}"

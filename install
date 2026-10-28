@@ -7,15 +7,21 @@ IFS=$'\n\t'
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
+# shellcheck source=tools/install_helpers.sh
+source "${SCRIPT_DIR}/tools/install_helpers.sh"
+
+# Report an error and stop the installer.
 die() {
   echo "ERROR: $*" >&2
   exit 1
 }
 
+# Check whether the apt package manager is available.
 is_apt_system() {
   command -v apt >/dev/null 2>&1
 }
 
+# Resolve an existing source path.
 abs_path() {
   # Returns an absolute path for an existing file/dir (best effort).
   # On Ubuntu/Mint, readlink -f is available.
@@ -23,6 +29,7 @@ abs_path() {
   readlink -f -- "$p"
 }
 
+# Back up an existing destination and link the repository source.
 create_safelink() {
   # Creates a symlink at $HOME/<dest_rel> pointing to <src_abs>.
   # If an existing item is present at the destination:
@@ -42,15 +49,14 @@ create_safelink() {
   if [[ -L "$dest" ]]; then
     rm -f -- "$dest"
   elif [[ -e "$dest" ]]; then
-    local ts
-    ts="$(date +%Y%m%d_%H%M%S)"
-    mv -- "$dest" "${dest}_old_${ts}"
+    backup_existing "$dest"
   fi
 
   mkdir -p -- "$(dirname -- "$dest")"
   ln -s -- "$src" "$dest"
 }
 
+# Link repository dotfiles into the current user home.
 install_dotfiles() {
   # Installs dotfiles and ~/.config entries by creating symlinks into the repo.
   local repo_home="${SCRIPT_DIR}/home"
@@ -76,6 +82,7 @@ install_dotfiles() {
   create_safelink ".Xdefaults"  "${repo_home}/.Xdefaults"
 }
 
+# Download Fira Code and refresh the user font cache.
 install_fira_font() {
   # Downloads and installs Fira Code into ~/.local/share/fonts and rebuilds font cache.
   local fonts_dir="${HOME}/.local/share/fonts"
@@ -95,6 +102,7 @@ install_fira_font() {
   fc-cache -f
 }
 
+# Install eza from its upstream apt repository.
 install_eza() {
   # Installs eza via the upstream deb repository.
   sudo apt install -y gpg wget
@@ -114,6 +122,7 @@ install_eza() {
   sudo apt install -y eza
 }
 
+# Build and install lolcat from its upstream source.
 install_lolcat() {
   # Builds and installs lolcat from source (idempotent: clone or pull).
   local olddir
@@ -136,6 +145,7 @@ install_lolcat() {
   cd "${olddir}"
 }
 
+# Print the dependencies used by the apt installer.
 print_dependencies() {
   # Prints dependency list for non-apt systems (best-effort package names).
   cat <<'EOF'
@@ -177,6 +187,7 @@ Additional installs performed by the script:
 EOF
 }
 
+# Print supported installation modes.
 usage() {
   echo "Install Elsni's linux environment for debian based systems"
   echo "usage: install.sh <OPTION>"
@@ -233,6 +244,8 @@ case "${1:-}" in
       fonts-noto fonts-noto-color-emoji \
       fonts-font-awesome 
     install_fira_font
+    install_eza
+    install_lolcat
     install_dotfiles
     exit 0
     ;;    

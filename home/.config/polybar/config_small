@@ -89,7 +89,7 @@ scroll-down = herbstclient use_index +1
 
 [module/info-hlwm-workspaces]
 type = custom/script
-exec = /home/elsni/.config/polybar/info-hlwm-workspaces.sh
+exec = "${env:HOME}/.config/polybar/info-hlwm-workspaces.sh"
 tail = true
 scroll-up = herbstclient use_index -1 --skip-visible &
 scroll-down = herbstclient use_index +1 --skip-visible &

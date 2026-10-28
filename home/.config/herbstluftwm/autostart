@@ -25,6 +25,7 @@ BACKGROUND='#5A8E3A'
 
 #############################################################################################################
 
+# Send a command to the running herbstluftwm instance.
 hc() {
     herbstclient "$@"
 }
@@ -176,9 +177,9 @@ hc keybind $WIN-i jumpto urgent
 #############################################################################################################
 # mouse
 hc mouseunbind --all
-hc mousebind $Mod-Button1 move
-hc mousebind $Mod-Button2 zoom
-hc mousebind $Mod-Button3 resize
+hc mousebind $WIN-Button1 move
+hc mousebind $WIN-Button2 zoom
+hc mousebind $WIN-Button3 resize
 
 
 #############################################################################################################

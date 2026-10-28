@@ -16,7 +16,7 @@ It supports:
 - `nano` is aliased to `micro`
 - `eza` as `ls` replacement
 - console prompt inspired by Kali Linux
-- colourful greeting using `neofetch`, `toilet`, `lolcat`
+- colourful greeting using `fastfetch`, `toilet`, `lolcat`
 - Go environment settings
 
 ### Midnight Commander (mc)
@@ -100,7 +100,10 @@ Run:
 It prints usage and the available modes.
 
 Both installers:
-- back up existing dotfiles by renaming them with a timestamp suffix
+- move existing files and directories into unique backup directories named
+  `<destination>_old_<timestamp>.<random>/original`
+- preserve earlier backups even when installations share the same timestamp
+- replace existing symlinks without backing up the link itself
 - create symlinks from this repository into your `$HOME`
 
 ## Validation and review
@@ -114,3 +117,11 @@ python3 -m unittest discover -s tests -v
 The checks parse shell scripts and exercise the apt installer's dotfile mode in
 an isolated temporary home. They do not install packages or start a desktop.
 See [REVIEW.md](REVIEW.md) for findings and remaining validation limits.
+
+Gentoo uses `app-misc/fastfetch` for the shell greeting. Dotfile-only installation
+(`-d`) does not invoke sudo. The apt terminal mode (`-k`) also installs `eza` and
+`lolcat`. Polybar resolves the workspace script relative to the current `$HOME`.
+
+To restore a backup, remove the installed symlink and move the backup directory's
+`original` entry back to its original destination. Keep the repository in place:
+the installed symlinks point into it.
