@@ -1,0 +1,63 @@
+#!/bin/bash
+# Remove redundant formulas left by earlier macOS installer versions.
+set -euo pipefail
+IFS=$'\n\t'
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=tools/mac_environment.sh
+source "${SCRIPT_DIR}/tools/mac_environment.sh"
+
+# Print the explicit preview and removal modes.
+usage() {
+  echo 'usage: ./cleanup_mac_once [--apply]'
+  echo 'Preview by default; --apply removes eligible git/curl/unzip/nano and neofetch formulas.'
+}
+
+# Build a limited removal list while preserving dependents and nano configuration.
+cleanup_formulas() {
+  local installed prefix package dependents
+  local remove=()
+  installed="$("$BREW_COMMAND" list --formula)"
+  prefix="$("$BREW_COMMAND" --prefix)"
+  for package in git curl unzip nano neofetch; do
+    if ! grep -Fxq "$package" <<< "$installed"; then
+      continue
+    fi
+    if [[ "$package" != neofetch && ! -x "/usr/bin/$package" ]]; then
+      printf 'Keep %s: no system executable.\n' "$package"
+      continue
+    fi
+    dependents="$("$BREW_COMMAND" uses --installed --recursive "$package")"
+    if [[ -n "$dependents" ]]; then
+      printf 'Keep %s: required by %s\n' "$package" "$dependents"
+      continue
+    fi
+    if [[ "$package" == nano && -f "$HOME/.nanorc" ]] &&
+        grep -Fq "$prefix/share/nano" "$HOME/.nanorc"; then
+      echo 'Keep nano: ~/.nanorc references its Homebrew syntax directory.'
+      continue
+    fi
+    printf 'Remove: %s\n' "$package"
+    remove+=("$package")
+  done
+  if [[ "${#remove[@]}" -eq 0 ]]; then
+    echo 'No eligible formulas remain.'
+  elif [[ "${1:-}" == --apply ]]; then
+    HOMEBREW_NO_AUTOREMOVE=1 HOMEBREW_NO_INSTALL_CLEANUP=1 \
+      "$BREW_COMMAND" uninstall --formula "${remove[@]}"
+  else
+    echo 'Preview only. Run ./cleanup_mac_once --apply to remove these formulas.'
+  fi
+  if [[ "${1:-}" == --apply ]] && command -v neofetch >/dev/null 2>&1; then
+    echo 'neofetch is still in PATH; installations outside this Homebrew are not removed.'
+  fi
+}
+
+# ---------------------- main ------------------------------------------
+case "${1:-}" in
+  ''|--apply)
+    require_mac_environment
+    cleanup_formulas "${1:-}"
+    ;;
+  -h|--help) usage ;;
+  *) usage >&2; exit 1 ;;
+esac

@@ -471,7 +471,7 @@ Run the non-destructive tests with Python 3:
 python3 -m unittest discover -s tests -v
 ```
 
-The suite currently contains 20 tests covering shell syntax, isolated dotfile
+The suite currently contains 23 tests covering shell syntax, isolated dotfile
 installation and repeat runs, backup collisions, dependency declarations,
 mocked installer dispatch, skipping existing console commands, macOS prerequisite
 checks, Homebrew discovery and
@@ -487,3 +487,16 @@ See [REVIEW.md](REVIEW.md) for review findings and validation limits. Source cha
 should include English function documentation, appropriate tests, and README
 updates when behavior changes. Keep source files below 500 lines and commit each
 work session with a meaningful message.
+
+## One-time macOS package cleanup
+
+After an older installer installed every formula, run `./cleanup_mac_once` to
+preview removal candidates. Run `./cleanup_mac_once --apply` to apply that plan.
+The script targets only Homebrew `git`, `curl`, `unzip`, and `nano` when their
+system executable exists under `/usr/bin`, plus Homebrew `neofetch`.
+It keeps formulas with installed dependents and keeps nano when `.nanorc` refers
+to its Homebrew syntax directory. This is not an exact rollback: older installer
+runs did not record which packages were present beforehand. It does not remove
+other shell tools, configuration, caches, or orphan dependencies. No force or
+dependency-ignoring uninstall is used. Rerunning is supported. Installations of
+neofetch outside the selected Homebrew are reported if still in PATH, not deleted.

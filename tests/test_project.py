@@ -14,7 +14,7 @@ class ProjectTests(unittest.TestCase):
 
     def test_shell_syntax(self):
         """Parse every maintained shell script without executing it."""
-        paths = [ROOT / name for name in ('install_debian', 'install_gentoo', 'install_mac', 'mac/.bashrc', 'home/.bashrc',
+        paths = [ROOT / name for name in ('install_debian', 'install_gentoo', 'install_mac', 'cleanup_mac_once', 'mac/.bashrc', 'home/.bashrc',
                                          'home/.config/herbstluftwm/autostart')]
         paths.extend(ROOT.glob('home/.config/**/*.sh'))
         paths.extend(ROOT.glob('tools/*.sh'))

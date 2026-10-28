@@ -72,3 +72,13 @@ reviewing its functions are outside these six installer/configuration fixes.
 - All 20 tests pass, including mixed existing/missing commands, no package
   operations when all commands exist, preserved native nano settings, and
   repeated installation after mocked package installation supplies missing tools.
+
+## One-time macOS cleanup
+
+Added `cleanup_mac_once`: preview by default, explicit `--apply` for removal of
+redundant git/curl/unzip/nano formulas and neofetch. Installed dependents and nano
+syntax references protect existing tools. No autoremove, force, or unrelated
+package deletion is performed. Three mocked cleanup tests cover preview,
+limited removal, repeated execution, and preservation rules (23 tests total).
+Shared macOS account validation and Homebrew discovery now live in
+`tools/mac_environment.sh`, used by both macOS scripts.
