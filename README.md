@@ -1,12 +1,56 @@
 # linux_stuff
 
-Personal Linux dotfiles, a macOS Bash environment, and installers for the tools
-used by those configurations. The Linux setup includes an optional herbstluftwm
-X11 desktop; the macOS setup is limited to command-line tools and shell settings.
+A version-controlled working environment for the command line and the Linux X11
+desktop. This repository brings together Bash configuration, console tools,
+editor settings, and an optional keyboard-driven desktop, with separate
+installers for Debian-based distributions, Gentoo, and macOS.
 
-The installers link configuration into your home directory and can install
-packages. Review the platform section before running an installation mode:
-existing configuration is replaced, with backups for regular files and directories.
+The environment is designed to make everyday navigation, editing, and window
+management more consistent across machines. Instead of configuring each tool
+independently, it provides a coordinated starting point that can be inspected,
+adapted, and maintained in Git. The configuration reflects a personal workflow;
+application choices and hardware-specific settings remain explicit and editable.
+
+The main benefits are:
+
+- **A consistent command-line workflow.** A clear two-line Bash prompt, shared
+  directory shortcuts, and eza listings with icons and Git information make it
+  easier to navigate projects and inspect files. A fastfetch greeting provides
+  system information when opening an interactive shell.
+- **Practical console tools.** micro and nano settings support terminal-based
+  editing, while Midnight Commander provides a two-panel file manager. These
+  tools offer a useful working environment for both local terminals and Linux
+  systems without a graphical desktop.
+- **Keyboard-driven window management on Linux.** The herbstluftwm X11 setup
+  combines tiling layouts, named workspaces, application rules, and shortcuts for
+  launching programs, moving windows, and changing focus. This helps keep
+  terminals, browsers, editors, and other applications organized with less manual
+  window placement.
+- **An integrated Linux desktop.** Polybar brings workspace navigation and system
+  status into a common panel, rofi provides an application launcher, and
+  Alacritty supplies a configured terminal. Fonts, colours, wallpaper, and
+  small-screen options provide a coordinated appearance that can be adjusted
+  alongside the functional settings.
+- **Platform-appropriate installation.** Linux users can choose console packages,
+  terminal fonts, or the X11 desktop dependencies through the available modes.
+  macOS receives a dedicated Bash environment and console tools while retaining
+  its native desktop. Its installer reuses commands already available and can
+  discover Homebrew after a switch from zsh to Bash.
+- **Configuration that remains reviewable.** Most settings are linked directly
+  from the checkout, so edits can be tracked in Git. Existing regular files and
+  directories are backed up before replacement, and automated tests cover key
+  installer behavior without installing real packages.
+
+The X11 components are intended for an existing Linux graphical environment;
+the installers do not provision an entire operating system, configure a display
+manager, or start a desktop session. Monitor connectors, preferred applications,
+and some panel settings should be adapted to the target machine. On macOS, only
+the shell and console configuration are installed.
+
+Start with the platform instructions below and choose the scope you need. Review
+the configuration destinations and backup behavior before installation: the
+scripts replace existing settings rather than merging them, and the checkout
+must remain in place for installed symlinks to work.
 
 ## Contents
 
