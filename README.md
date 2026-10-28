@@ -109,7 +109,15 @@ checks the account setting with `dscl` and does not change it. Apple's `/bin/bas
 (3.2) and Homebrew Bash are supported. To select Apple's Bash yourself, use
 `chsh -s /bin/bash`, then open a new terminal.
 
-[Homebrew](https://brew.sh/) must already be installed and `brew` must be in PATH.
+[Homebrew](https://brew.sh/) must already be installed. If `brew` is missing from
+Bash's PATH after switching from zsh, the installer discovers it at the standard
+macOS locations (`/opt/homebrew/bin/brew` and `/usr/local/bin/brew`), preferring
+the native architecture. An existing `brew` in PATH takes precedence. For a
+custom installation outside PATH, set `HOMEBREW_PREFIX` to its installation root.
+The installer initializes Homebrew using `brew shellenv` immediately and writes
+the detected executable's absolute path into `~/.bash_profile` for future Bash
+login shells. The already-open parent shell is not changed; open a new terminal
+or run `source ~/.bash_profile` after installation.
 Run as your regular user:
 
 ```sh
@@ -147,7 +155,7 @@ Run the non-destructive checks with Python 3:
 python3 -m unittest discover -s tests -v
 ```
 
-The 15 checks parse shell scripts and exercise the Debian and macOS installers
+The 18 checks parse shell scripts and exercise the Debian and macOS installers
 in isolated temporary homes. macOS package operations and account information
 are mocked; Bash startup is exercised with Apple's `/bin/bash`. Tests do not
 install packages or start a desktop.

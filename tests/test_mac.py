@@ -25,13 +25,13 @@ class MacTests(unittest.TestCase):
         (self.prefix / 'share/nano').mkdir(parents=True)
         self.env = dict(os.environ, HOME=str(self.home),
                         PATH=str(self.bin) + ':' + os.environ['PATH'],
-                        MAC_TEST_PREFIX=str(self.prefix), MAC_TEST_SHELL='/bin/bash',
+                        HOMEBREW_PREFIX='', MAC_TEST_PREFIX=str(self.prefix), MAC_TEST_SHELL='/bin/bash',
                         MAC_TEST_PLATFORM='Darwin', MAC_TEST_LOG=str(self.base / 'brew.log'))
         self.command('uname', 'echo "$MAC_TEST_PLATFORM"')
         self.command('dscl', 'echo "UserShell: $MAC_TEST_SHELL"')
         self.command('brew', '''case "$1" in
 --prefix) printf '%s\\n' "$MAC_TEST_PREFIX" ;;
-shellenv) echo 'export MAC_TEST_BREW_LOADED=yes' ;;
+shellenv) printf 'export MAC_TEST_BREW_LOADED=yes; export PATH=%q:$PATH\\n' "$(dirname "$0")" ;;
 install) printf '%s\\n' "$@" >> "$MAC_TEST_LOG" ;;
 *) exit 1 ;;
 esac''')
@@ -46,8 +46,17 @@ esac''')
 
     def run_installer(self, mode):
         """Run the real entry point with the isolated environment."""
-        return subprocess.run(['/bin/bash', str(ROOT / 'install_mac'), mode],
-                              env=self.env, capture_output=True, text=True)
+        source, main = (ROOT / 'install_mac').read_text().split(
+            '# ---------------------- main', 1)
+        source = '\n'.join(line for line in source.splitlines()
+                           if not line.startswith('SCRIPT_DIR='))
+        # Keep standard-prefix discovery isolated from actual host installations.
+        script = ('SCRIPT_DIR=' + shlex.quote(str(ROOT)) + '\n' + source +
+                  '\n# Print isolated Homebrew locations for this test account.\n'
+                  'homebrew_locations() { printf "%s\\n" "$MAC_TEST_PREFIX/bin/brew"; }\n'
+                  'set -- ' + shlex.quote(mode) + '\n' + main.split('\n', 1)[1])
+        return subprocess.run(['/bin/bash', '-c', script], env=self.env,
+                              capture_output=True, text=True)
 
     def require_regular_user(self):
         """Skip successful account installation when the test runner is root."""
@@ -117,6 +126,52 @@ esac''')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Install Homebrew', result.stderr)
         self.assertEqual(list(self.home.iterdir()), [])
+
+    def test_homebrew_outside_path(self):
+        """Discover Homebrew after switching from zsh and initialize later Bash logins."""
+        self.require_regular_user()
+        (self.prefix / 'bin').mkdir()
+        (self.bin / 'brew').rename(self.prefix / 'bin/brew')
+        result = self.run_installer('-c')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue((self.base / 'brew.log').exists())
+        profile = (self.home / '.bash_profile').read_text()
+        self.assertIn(str(self.prefix / 'bin/brew'), profile.replace('\\', ''))
+        startup = subprocess.run(['/bin/bash', '--noprofile', '--norc', '-ic',
+                                  'source "$HOME/.bash_profile"; '
+                                  'test "$MAC_TEST_BREW_LOADED" = yes || exit 1; '
+                                  'command -v brew'], env=self.env,
+                                 capture_output=True, text=True)
+        self.assertEqual(startup.returncode, 0, startup.stderr)
+        self.assertIn(str(self.prefix / 'bin/brew'), startup.stdout)
+
+    def test_native_homebrew_location_order(self):
+        """Prefer the native standard prefix on Apple Silicon and Intel Macs."""
+        source = (ROOT / 'install_mac').read_text().split('# ---------------------- main')[0]
+        source = '\n'.join(line for line in source.splitlines()
+                           if not line.startswith('SCRIPT_DIR='))
+        for architecture, expected in (
+                ('arm64', ['/opt/homebrew/bin/brew', '/usr/local/bin/brew']),
+                ('x86_64', ['/usr/local/bin/brew', '/opt/homebrew/bin/brew'])):
+            with self.subTest(architecture=architecture):
+                script = ('SCRIPT_DIR=' + shlex.quote(str(ROOT)) + '\n' + source +
+                          '\n# Report the architecture under test.\n'
+                          'uname() { echo ' + architecture + '; }\nhomebrew_locations')
+                result = subprocess.run(['/bin/bash', '-c', script], env=self.env,
+                                        capture_output=True, text=True, check=True)
+                self.assertEqual(result.stdout.splitlines(), expected)
+
+    def test_custom_homebrew_prefix(self):
+        """Honor an explicit custom prefix when brew is absent from PATH."""
+        self.require_regular_user()
+        custom = self.base / 'custom brew'
+        (custom / 'bin').mkdir(parents=True)
+        (self.bin / 'brew').rename(custom / 'bin/brew')
+        self.env['HOMEBREW_PREFIX'] = str(custom)
+        result = self.run_installer('-d')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(str(custom / 'bin/brew'),
+                      (self.home / '.bash_profile').read_text().replace('\\', ''))
 
     def test_print_dependencies_without_platform_requirements(self):
         """List dependencies without checking or modifying the account."""

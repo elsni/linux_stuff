@@ -20,10 +20,40 @@ usage() {
   echo "-c   install Homebrew console dependencies and shell configuration"
   echo "-d   install shell configuration only (dependencies must already exist)"
   echo "-p   print Homebrew formula names"
-  echo "Requires macOS, Bash as the account's default shell, and Homebrew in PATH."
+  echo "Requires macOS, Bash as the account's default shell, and an existing Homebrew installation."
 }
 
-# Verify the operating system, account login shell, and Homebrew executable.
+# Print standard Homebrew executables in the native architecture's order.
+homebrew_locations() {
+  case "$(uname -m)" in
+    arm64) printf '%s\n' /opt/homebrew/bin/brew /usr/local/bin/brew ;;
+    *) printf '%s\n' /usr/local/bin/brew /opt/homebrew/bin/brew ;;
+  esac
+}
+
+# Locate existing Homebrew and initialize its environment for this installer.
+initialize_homebrew() {
+  BREW_COMMAND="$(command -v brew || true)"
+  if [[ -z "$BREW_COMMAND" ]]; then
+    local candidate
+    if [[ -n "${HOMEBREW_PREFIX:-}" && -x "${HOMEBREW_PREFIX}/bin/brew" ]]; then
+      BREW_COMMAND="${HOMEBREW_PREFIX}/bin/brew"
+    else
+      while IFS= read -r candidate; do
+        if [[ -x "$candidate" ]]; then
+          BREW_COMMAND="$candidate"
+          break
+        fi
+      done < <(homebrew_locations)
+    fi
+  fi
+  [[ -n "$BREW_COMMAND" ]] || die "Install Homebrew first; for a custom installation, set HOMEBREW_PREFIX."
+  local shell_environment
+  shell_environment="$("$BREW_COMMAND" shellenv)"
+  eval "$shell_environment"
+}
+
+# Verify the operating system and account login shell, then initialize Homebrew.
 require_mac_environment() {
   [[ "$(uname -s)" == Darwin ]] || die "This installer requires macOS."
   [[ "$EUID" -ne 0 ]] || die "Run this installer as your regular user, without sudo."
@@ -32,7 +62,7 @@ require_mac_environment() {
   login_shell="${login_shell#UserShell: }"
   [[ "${login_shell##*/}" == bash && -x "$login_shell" ]] ||
     die "Bash must be your default login shell. Set it with chsh before installation."
-  command -v brew >/dev/null 2>&1 || die "Install Homebrew and add brew to PATH first."
+  initialize_homebrew
 }
 
 # Back up a destination before replacing its contents or symlink.
@@ -57,9 +87,8 @@ link_shell_config() {
 
 # Install portable editor settings and a Bash login entry point for Homebrew.
 install_dotfiles() {
-  local brew_command brew_prefix
-  brew_command="$(command -v brew)"
-  brew_prefix="$(brew --prefix)"
+  local brew_prefix
+  brew_prefix="$("$BREW_COMMAND" --prefix)"
   [[ -d "$brew_prefix/share/nano" ]] || die "Homebrew nano is required for syntax definitions."
   link_shell_config "${SCRIPT_DIR}/mac/.bashrc" .bashrc
   link_shell_config "${SCRIPT_DIR}/home/.config/micro" .config/micro
@@ -68,7 +97,7 @@ install_dotfiles() {
   prepare_destination "${HOME}/.bash_profile"
   {
     echo '# Initialize Homebrew and load interactive Bash settings.'
-    printf 'eval "$(%q shellenv)"\n' "$brew_command"
+    printf 'eval "$(%q shellenv)"\n' "$BREW_COMMAND"
     printf 'if [[ $- == *i* ]]; then source "$HOME/.bashrc"; fi\n'
   } > "${HOME}/.bash_profile"
 
@@ -86,7 +115,7 @@ case "${1:-}" in
   -c|-d)
     require_mac_environment
     if [[ "$1" == -c ]]; then
-      brew install "${CONSOLE_PKGS[@]}"
+      "$BREW_COMMAND" install "${CONSOLE_PKGS[@]}"
     fi
     install_dotfiles
     ;;
