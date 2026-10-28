@@ -19,7 +19,7 @@
 
 Run `python3 -m unittest discover -s tests -v`.
 
-Eight tests cover shell syntax, isolated dotfile installation and repetition,
+Fifteen tests cover shell syntax, isolated dotfile installation and repetition,
 file and directory backups with identical timestamps in both installers,
 Gentoo dotfile installation without privilege operations, mocked apt terminal
 mode dispatch, desktop configuration, and the fastfetch package declaration.
@@ -32,3 +32,19 @@ Installer functions and the shared helper have English documentation comments.
 Changed source files are below 500 lines. The pre-existing bundled third-party
 micro filemanager plugin remains 1,366 lines; splitting that dependency and
 reviewing its functions are outside these six installer/configuration fixes.
+
+## Platform installers
+
+- Renamed the Debian entry point to `install_debian`; documentation, usage output,
+  and tests use the new name. No legacy wrapper is provided.
+- Added `install_mac` with explicit Homebrew console formulas and separate
+  macOS Bash settings. Installation requires macOS, a Bash account login shell,
+  a regular user, and Homebrew already in PATH.
+- Only `.bashrc`, `.bash_profile`, `.nanorc`, micro, and mc configuration are
+  installed on macOS. No X11 or desktop configuration is linked.
+- Seven additional macOS tests cover package dispatch, backups and repeat runs,
+  interactive profile loading, configuration-only mode, rejected platforms and
+  zsh accounts, missing Homebrew, dependency listing, and directory navigation.
+- Tests use temporary homes and mocked Homebrew/platform commands. The actual
+  Apple Bash 3.2 executable parses and exercises the new shell settings on this
+  host. Real Homebrew package installation has not been run.

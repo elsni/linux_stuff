@@ -14,7 +14,7 @@ class ProjectTests(unittest.TestCase):
 
     def test_shell_syntax(self):
         """Parse every maintained shell script without executing it."""
-        paths = [ROOT / name for name in ('install', 'install_gentoo', 'home/.bashrc',
+        paths = [ROOT / name for name in ('install_debian', 'install_gentoo', 'install_mac', 'mac/.bashrc', 'home/.bashrc',
                                          'home/.config/herbstluftwm/autostart')]
         paths.extend(ROOT.glob('home/.config/**/*.sh'))
         paths.extend(ROOT.glob('tools/*.sh'))
@@ -29,7 +29,7 @@ class ProjectTests(unittest.TestCase):
             (home / '.bashrc').write_text('original\n')
             env = dict(os.environ, HOME=directory)
             for _ in range(2):
-                subprocess.run(['bash', str(ROOT / 'install'), '-d'], env=env,
+                subprocess.run(['bash', str(ROOT / 'install_debian'), '-d'], env=env,
                                check=True, capture_output=True, text=True)
             self.assertEqual((home / '.bashrc').resolve(), ROOT / 'home/.bashrc')
             backups = list(home.glob('.bashrc_old_*'))
@@ -41,7 +41,7 @@ class ProjectTests(unittest.TestCase):
 
     def test_dependency_listing(self):
         """Print apt dependencies without modifying the host."""
-        result = subprocess.run(['bash', str(ROOT / 'install'), '-p'],
+        result = subprocess.run(['bash', str(ROOT / 'install_debian'), '-p'],
                                 check=True, capture_output=True, text=True)
         self.assertIn('Dependencies used by this installer', result.stdout)
 
@@ -57,7 +57,7 @@ class ProjectTests(unittest.TestCase):
 
     def test_backup_collisions(self):
         """Preserve files and directories even when backup timestamps are identical."""
-        for installer in ('install', 'install_gentoo'):
+        for installer in ('install_debian', 'install_gentoo'):
             with self.subTest(installer=installer), tempfile.TemporaryDirectory() as d:
                 home = Path(d)
                 self.run_functions(installer, """
@@ -95,7 +95,7 @@ install_dotfiles
     def test_terminal_mode_dependencies(self):
         """Exercise terminal mode dispatch with mocked installation operations."""
         with tempfile.TemporaryDirectory() as d:
-            result = self.run_functions('install', """
+            result = self.run_functions('install_debian', """
 # Replace package operations with observable test doubles.
 # Accept the mocked package platform.
 is_apt_system() { return 0; }
@@ -110,7 +110,7 @@ install_lolcat() { echo lolcat; }
 # Record dotfile installation.
 install_dotfiles() { echo dotfiles; }
 set -- -k
-""" + (ROOT / 'install').read_text().split('# ---------------------- main')[1].split('\n', 1)[1], Path(d))
+""" + (ROOT / 'install_debian').read_text().split('# ---------------------- main')[1].split('\n', 1)[1], Path(d))
             for dependency in ('fonts', 'eza', 'lolcat', 'dotfiles'):
                 self.assertIn(dependency, result.stdout.splitlines())
 

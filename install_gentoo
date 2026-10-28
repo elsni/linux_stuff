@@ -190,7 +190,7 @@ require_gentoo
 case "${1:-}" in
   "")
     echo "Install Elsni's linux environment (Gentoo edition)"
-    echo "usage: install-gentoo.sh <OPTION>"
+    echo "usage: ./install_gentoo <OPTION>"
     echo "where OPTION can be:"
     echo "-c   install console dependencies and dotfiles"
     echo "-g   install gui dependencies and dotfiles"
