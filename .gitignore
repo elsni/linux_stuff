@@ -1,2 +1,4 @@
 home/.config/micro/buffers
 home/.config/micro/backups
+
+__pycache__/

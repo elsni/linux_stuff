@@ -102,3 +102,15 @@ It prints usage and the available modes.
 Both installers:
 - back up existing dotfiles by renaming them with a timestamp suffix
 - create symlinks from this repository into your `$HOME`
+
+## Validation and review
+
+Run the non-destructive checks with Python 3:
+
+```sh
+python3 -m unittest discover -s tests -v
+```
+
+The checks parse shell scripts and exercise the apt installer's dotfile mode in
+an isolated temporary home. They do not install packages or start a desktop.
+See [REVIEW.md](REVIEW.md) for findings and remaining validation limits.
