@@ -231,7 +231,7 @@ See the official [Homebrew installation and shell setup documentation](https://d
 | --- | --- | --- |
 | No argument | None; print usage | None |
 | `-p` | None; print Homebrew formula names | None |
-| `-c` | Install console formulas through Homebrew | macOS shell and editor settings |
+| `-c` | Install only missing console commands through Homebrew | macOS shell and editor settings |
 | `-d` | None; initialize existing Homebrew | macOS shell and editor settings |
 
 ```sh
@@ -252,11 +252,19 @@ Homebrew PATH available there.
 
 ### Installed tools and configuration
 
-The Homebrew formula list is:
+The supported Homebrew formula list is:
 
 ```text
 git curl unzip fastfetch toilet midnight-commander nano micro eza lolcat
 ```
+
+After initializing Homebrew, `-c` checks each corresponding command with
+`command -v`. Existing commands are kept regardless of how they were installed;
+for example, Apple's Git is sufficient. `midnight-commander` is checked as `mc`;
+all other formulas use their own name as the command. Only formulas for missing
+commands are passed to `brew install`. If none are missing, no install command
+is issued. Availability is checked, not tool version or feature compatibility.
+`-p` still prints the complete supported formula list.
 
 The macOS installer links only these repository settings:
 
@@ -266,16 +274,18 @@ The macOS installer links only these repository settings:
 | `~/.config/micro` | `home/.config/micro` |
 | `~/.config/mc` | `home/.config/mc` |
 
-It also generates two regular files:
+It also manages these regular files:
 
 - `~/.bash_profile`: initializes the discovered Homebrew installation and sources
   `.bashrc` for interactive login shells.
 - `~/.nanorc`: enables line numbers, cursor information, history, and syntax
-  definitions from the detected Homebrew prefix's `share/nano` directory.
+  definitions from the detected Homebrew prefix's `share/nano` directory, when
+  that directory exists. Otherwise `.nanorc` is left unchanged, allowing an
+  existing system nano to remain in use without installing Homebrew nano.
 
-`-d` assumes dependencies are already installed and checks that Homebrew's nano
-syntax directory exists. It is not a way to install a usable environment without
-Homebrew. It does not individually validate every other console dependency.
+`-d` assumes dependencies are already installed and does not validate each
+console command. Homebrew is still required to initialize the profile and locate
+its optional nano syntax definitions.
 
 Existing profile content is backed up rather than merged. If your previous Bash
 profile contained other setup, review its backup and reapply the parts you need.
@@ -445,7 +455,7 @@ application and font configuration to the user.
 | `brew` worked in zsh but is missing in Bash | Run `./install_mac -c`; standard Homebrew installations are discovered without PATH setup. Then open a new terminal or source `.bash_profile`. |
 | Homebrew is installed in a custom location | Supply its absolute installation root through `HOMEBREW_PREFIX` if brew is not in PATH. |
 | macOS installer rejects the login shell | Check `dscl` output, select Bash with `chsh`, and open a new terminal. Starting a Bash subprocess alone does not change the account setting. |
-| macOS configuration-only mode reports missing nano syntax | Install the Homebrew console dependencies with `./install_mac -c`, or install Homebrew nano before using `-d`. |
+| macOS setup leaves `.nanorc` unchanged | Homebrew nano syntax definitions are absent. Existing system nano is kept; install Homebrew nano separately if you want the generated syntax configuration. |
 | Greeting reports a missing command | Install console dependencies. Linux `-g` and all `-d` modes assume relevant console tools already exist. |
 | apt or emerge cannot resolve a package | Check the requested name/atom against the repositories enabled on your system; the installer stops rather than substituting another tool. |
 | Shell settings did not change after installation | Start a new interactive Bash. On macOS, source `.bash_profile`; on Linux, check that your shell startup loads `.bashrc`. |
@@ -461,9 +471,10 @@ Run the non-destructive tests with Python 3:
 python3 -m unittest discover -s tests -v
 ```
 
-The suite currently contains 18 tests covering shell syntax, isolated dotfile
+The suite currently contains 20 tests covering shell syntax, isolated dotfile
 installation and repeat runs, backup collisions, dependency declarations,
-mocked installer dispatch, macOS prerequisite checks, Homebrew discovery and
+mocked installer dispatch, skipping existing console commands, macOS prerequisite
+checks, Homebrew discovery and
 architecture preference, interactive Bash startup, and directory navigation.
 
 Tests use temporary homes and mocked Homebrew/platform commands. They do not

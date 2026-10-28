@@ -17,7 +17,7 @@ die() {
 # Print the supported shell-only installation modes.
 usage() {
   echo "usage: ./install_mac <-c|-d|-p>"
-  echo "-c   install Homebrew console dependencies and shell configuration"
+  echo "-c   install missing console commands with Homebrew and shell configuration"
   echo "-d   install shell configuration only (dependencies must already exist)"
   echo "-p   print Homebrew formula names"
   echo "Requires macOS, Bash as the account's default shell, and an existing Homebrew installation."
@@ -65,6 +65,26 @@ require_mac_environment() {
   initialize_homebrew
 }
 
+# Install formulas only when their corresponding executable is missing from PATH.
+install_console() {
+  local package executable
+  local missing=()
+  for package in "${CONSOLE_PKGS[@]}"; do
+    executable="$package"
+    [[ "$package" != midnight-commander ]] || executable=mc
+    if command -v "$executable" >/dev/null 2>&1; then
+      printf 'Already available: %s (skipping %s)\n' "$executable" "$package"
+    else
+      missing+=("$package")
+    fi
+  done
+  if [[ "${#missing[@]}" -gt 0 ]]; then
+    "$BREW_COMMAND" install "${missing[@]}"
+  else
+    echo "All console commands are already available; no packages to install."
+  fi
+}
+
 # Back up a destination before replacing its contents or symlink.
 prepare_destination() {
   local dest="$1"
@@ -89,7 +109,6 @@ link_shell_config() {
 install_dotfiles() {
   local brew_prefix
   brew_prefix="$("$BREW_COMMAND" --prefix)"
-  [[ -d "$brew_prefix/share/nano" ]] || die "Homebrew nano is required for syntax definitions."
   link_shell_config "${SCRIPT_DIR}/mac/.bashrc" .bashrc
   link_shell_config "${SCRIPT_DIR}/home/.config/micro" .config/micro
   link_shell_config "${SCRIPT_DIR}/home/.config/mc" .config/mc
@@ -101,11 +120,15 @@ install_dotfiles() {
     printf 'if [[ $- == *i* ]]; then source "$HOME/.bashrc"; fi\n'
   } > "${HOME}/.bash_profile"
 
-  prepare_destination "${HOME}/.nanorc"
-  {
-    printf 'set constantshow\nset linenumbers\nset historylog\n'
-    printf 'include "%s/share/nano/*.nanorc"\n' "$brew_prefix"
-  } > "${HOME}/.nanorc"
+  if [[ -d "$brew_prefix/share/nano" ]]; then
+    prepare_destination "${HOME}/.nanorc"
+    {
+      printf 'set constantshow\nset linenumbers\nset historylog\n'
+      printf 'include "%s/share/nano/*.nanorc"\n' "$brew_prefix"
+    } > "${HOME}/.nanorc"
+  else
+    echo "No Homebrew nano syntax directory; leaving ~/.nanorc unchanged."
+  fi
 }
 
 # ---------------------- main ------------------------------------------
@@ -115,7 +138,7 @@ case "${1:-}" in
   -c|-d)
     require_mac_environment
     if [[ "$1" == -c ]]; then
-      "$BREW_COMMAND" install "${CONSOLE_PKGS[@]}"
+      install_console
     fi
     install_dotfiles
     ;;

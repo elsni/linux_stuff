@@ -24,15 +24,24 @@ class MacTests(unittest.TestCase):
         self.prefix = self.base / 'brew prefix'
         (self.prefix / 'share/nano').mkdir(parents=True)
         self.env = dict(os.environ, HOME=str(self.home),
-                        PATH=str(self.bin) + ':' + os.environ['PATH'],
+                        PATH=str(self.bin) + ':/usr/bin:/bin',
                         HOMEBREW_PREFIX='', MAC_TEST_PREFIX=str(self.prefix), MAC_TEST_SHELL='/bin/bash',
-                        MAC_TEST_PLATFORM='Darwin', MAC_TEST_LOG=str(self.base / 'brew.log'))
+                        MAC_TEST_BIN=str(self.bin), MAC_TEST_PLATFORM='Darwin', MAC_TEST_LOG=str(self.base / 'brew.log'))
         self.command('uname', 'echo "$MAC_TEST_PLATFORM"')
         self.command('dscl', 'echo "UserShell: $MAC_TEST_SHELL"')
         self.command('brew', '''case "$1" in
 --prefix) printf '%s\\n' "$MAC_TEST_PREFIX" ;;
 shellenv) printf 'export MAC_TEST_BREW_LOADED=yes; export PATH=%q:$PATH\\n' "$(dirname "$0")" ;;
-install) printf '%s\\n' "$@" >> "$MAC_TEST_LOG" ;;
+install)
+  printf '%s\\n' "$@" >> "$MAC_TEST_LOG"
+  shift
+  for package in "$@"; do
+    executable="$package"
+    [[ "$package" != midnight-commander ]] || executable=mc
+    printf '#!/bin/bash\\n:\\n' > "$MAC_TEST_BIN/$executable"
+    chmod +x "$MAC_TEST_BIN/$executable"
+  done
+  ;;
 *) exit 1 ;;
 esac''')
         for name in ('fastfetch', 'toilet', 'lolcat'):
@@ -79,9 +88,7 @@ esac''')
                          ['mc', 'micro'])
         self.assertFalse((self.home / '.Xresources').exists())
         packages = (self.base / 'brew.log').read_text().splitlines()
-        self.assertEqual(packages, ['install', 'git', 'curl', 'unzip', 'fastfetch',
-                                    'toilet', 'midnight-commander', 'nano', 'micro',
-                                    'eza', 'lolcat'] * 2)
+        self.assertEqual(packages, ['install', 'midnight-commander', 'micro', 'eza'])
         self.assertIn(str(self.prefix / 'share/nano/*.nanorc'),
                       (self.home / '.nanorc').read_text())
         startup = subprocess.run(['/bin/bash', '--noprofile', '--norc', '-ic',
@@ -91,6 +98,31 @@ esac''')
         self.assertEqual(startup.returncode, 0, startup.stderr)
         self.assertIn('eza', startup.stdout)
         self.assertNotIn('command not found', startup.stderr)
+
+    def test_existing_external_commands_skip_homebrew(self):
+        """Keep commands from other installations, including mc, without brew install."""
+        self.require_regular_user()
+        for name in ('git', 'curl', 'unzip', 'mc', 'nano', 'micro', 'eza'):
+            self.command(name, ':')
+        (self.prefix / 'share/nano').rmdir()
+        (self.home / '.nanorc').write_text('existing native nano settings')
+        result = self.run_installer('-c')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse((self.base / 'brew.log').exists())
+        self.assertIn('Already available: git', result.stdout)
+        self.assertIn('Already available: mc (skipping midnight-commander)', result.stdout)
+        self.assertEqual((self.home / '.nanorc').read_text(), 'existing native nano settings')
+        self.assertEqual(list(self.home.glob('.nanorc_old_*')), [])
+
+    def test_missing_command_installs_only_its_formula(self):
+        """Install only the missing mapped formula while keeping all other tools."""
+        self.require_regular_user()
+        for name in ('git', 'curl', 'unzip', 'nano', 'micro', 'eza'):
+            self.command(name, ':')
+        result = self.run_installer('-c')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((self.base / 'brew.log').read_text().splitlines(),
+                         ['install', 'midnight-commander'])
 
     def test_dotfiles_only(self):
         """Install configuration without asking Homebrew to install packages."""

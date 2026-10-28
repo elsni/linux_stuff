@@ -19,7 +19,7 @@
 
 Run `python3 -m unittest discover -s tests -v`.
 
-Eighteen tests cover shell syntax, isolated dotfile installation and repetition,
+Twenty tests cover shell syntax, isolated dotfile installation and repetition,
 file and directory backups with identical timestamps in both installers,
 Gentoo dotfile installation without privilege operations, mocked apt terminal
 mode dispatch, desktop configuration, and the fastfetch package declaration.
@@ -59,3 +59,16 @@ reviewing its functions are outside these six installer/configuration fixes.
   a custom prefix, and the native prefix order on Apple Silicon and Intel.
 - All 18 tests pass; package installation remains mocked and no real dotfiles
   were modified during verification.
+
+## Reuse existing macOS console tools
+
+- macOS console installation checks command availability after Homebrew setup.
+  Existing tools from any installation are retained; `midnight-commander` maps
+  to the executable `mc`. Only missing commands trigger formula installation.
+- Homebrew is still required. Tool versions are not checked.
+- `.nanorc` is generated only when Homebrew nano syntax definitions exist;
+  otherwise existing nano settings remain untouched. System nano does not
+  force an additional Homebrew nano installation.
+- All 20 tests pass, including mixed existing/missing commands, no package
+  operations when all commands exist, preserved native nano settings, and
+  repeated installation after mocked package installation supplies missing tools.
