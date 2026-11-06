@@ -154,7 +154,8 @@ alternatives, not a sequence to execute in full.
 
 On an active 1024×600 display, the herbstluftwm autostart selects the
 compact Polybar configuration, 2-pixel window borders, and a dedicated
-wallpaper with readable shortcut labels. Other resolutions use the regular wallpaper and panel configuration.
+wallpaper with readable shortcut labels. When Chromium is installed, the
+browser shortcut starts it with GPU acceleration disabled and a 0.7 scale. Other resolutions use the regular wallpaper and panel configuration.
 The X server manages connected displays, while Polybar discovers wired and
 wireless interfaces by type instead of requiring machine-specific names.
 The herbstluftwm startup loads X resources, including XTerm's black background

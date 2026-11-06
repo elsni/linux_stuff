@@ -81,12 +81,17 @@ fi
 # firefox-esr als fallback-browser
 if command -v firefox-esr &> /dev/null
 then
-	hc keybind $WIN-$ALT-b spawn firefox-esr &
+	hc keybind $WIN-$ALT-b spawn firefox-esr
 fi
 
 if command -v $BROWSER &> /dev/null
 then
-	hc keybind $WIN-$ALT-b spawn $BROWSER &
+	hc keybind $WIN-$ALT-b spawn "$BROWSER"
+fi
+
+# Prefer the compact Chromium layout on 1024x600 displays.
+if [ "$SMALLSCREEN" = true ] && command -v chromium >/dev/null 2>&1; then
+    hc keybind "$WIN-$ALT-b" spawn chromium --disable-gpu --force-device-scale-factor=0.7
 fi
 
 # Spotify - Music Player
