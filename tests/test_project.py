@@ -153,7 +153,7 @@ install_fastfetch
     def test_desktop_configuration(self):
         """Check portable workspace paths and the configured mouse modifier."""
         for config in (ROOT / 'home/.config/polybar').glob('config*'):
-            self.assertIn('exec = "${env:HOME}/.config/polybar/info-hlwm-workspaces.sh"',
+            self.assertIn('exec = "$HOME/.config/polybar/info-hlwm-workspaces.sh"',
                           config.read_text())
             self.assertNotIn('/home/elsni/', config.read_text())
         autostart = (ROOT / 'home/.config/herbstluftwm/autostart').read_text()
