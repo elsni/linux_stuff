@@ -33,6 +33,11 @@ hc() {
     herbstclient "$@"
 }
 
+# Load user X resources for newly started applications.
+if [ -r "$HOME/.Xresources" ]; then
+    xrdb -merge "$HOME/.Xresources"
+fi
+
 hc emit_hook reload
 
 xsetroot -solid $BACKGROUND

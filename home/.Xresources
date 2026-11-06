@@ -1,6 +1,6 @@
 XTerm*renderFont: true
-XTerm*faceName: VeraMono
-XTerm*faceSize: 10
+XTerm*faceName: Fira Code
+XTerm*faceSize: 9
 XTerm*background: black
 XTerm*foreground: white
 ssh-askpass*faceName: VeraMono

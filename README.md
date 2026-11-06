@@ -157,6 +157,8 @@ compact Polybar configuration and a dedicated wallpaper with readable shortcut
 labels. Other resolutions use the regular wallpaper and panel configuration.
 The X server manages connected displays, while Polybar discovers wired and
 wireless interfaces by type instead of requiring machine-specific names.
+The herbstluftwm startup loads X resources, including XTerm's black background
+and Fira Code font at size 9.
 
 ### Package and download behavior
 
