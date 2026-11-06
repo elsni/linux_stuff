@@ -122,91 +122,133 @@ install_fira_font() {
 # Install fastfetch from configured apt sources or the official GitHub release.
 install_fastfetch() {
   local candidate arch asset url package
-  candidate="$(LC_ALL=C apt-cache policy fastfetch | awk '/Candidate:/ {print $2}')"
-  if [[ -n "$candidate" && "$candidate" != "(none)" ]]; then
-    sudo apt install -y fastfetch
+  if command -v fastfetch >/dev/null 2>&1; then
+    echo "fastfetch is already installed."
   else
-    arch="$(dpkg --print-architecture)"
-    case "$arch" in
-      amd64) asset=amd64 ;;
-      i386) asset=i686 ;;
-      arm64) asset=aarch64 ;;
-      armhf) asset=armv7l ;;
-      ppc64el) asset=ppc64le ;;
-      riscv64|s390x|loongarch64) asset="$arch" ;;
-      *) die "No official fastfetch release mapping for architecture: $arch" ;;
-    esac
-    url="$(curl --fail --location --show-error https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest |
-      python3 -c 'import json,sys; name="fastfetch-linux-" + sys.argv[1] + ".deb"; matches=[a["browser_download_url"] for a in json.load(sys.stdin)["assets"] if a["name"] == name]; print(matches[0] if len(matches) == 1 else "")' "$asset")"
-    [[ -n "$url" ]] || die "Official fastfetch package not found for $arch"
-    package="$(mktemp -d)"
-    if ! curl --fail --location --show-error "$url" -o "$package/fastfetch.deb"; then
+    candidate="$(LC_ALL=C apt-cache policy fastfetch | awk '/Candidate:/ {print $2}')"
+    if [[ -n "$candidate" && "$candidate" != "(none)" ]]; then
+      sudo apt install -y fastfetch
+    else
+      arch="$(dpkg --print-architecture)"
+      case "$arch" in
+        amd64) asset=amd64 ;;
+        i386) asset=i686 ;;
+        arm64) asset=aarch64 ;;
+        armhf) asset=armv7l ;;
+        ppc64el) asset=ppc64le ;;
+        riscv64|s390x|loongarch64) asset="$arch" ;;
+        *) die "No official fastfetch release mapping for architecture: $arch" ;;
+      esac
+      url="$(curl --fail --location --show-error https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest |
+        python3 -c 'import json,sys; name="fastfetch-linux-" + sys.argv[1] + ".deb"; matches=[a["browser_download_url"] for a in json.load(sys.stdin)["assets"] if a["name"] == name]; print(matches[0] if len(matches) == 1 else "")' "$asset")"
+      [[ -n "$url" ]] || die "Official fastfetch package not found for $arch"
+      package="$(mktemp -d)"
+      if ! curl --fail --location --show-error "$url" -o "$package/fastfetch.deb"; then
+        rm -rf -- "$package"
+        die "Failed to download fastfetch"
+      fi
+      if ! sudo apt install -y "$package/fastfetch.deb"; then
+        rm -rf -- "$package"
+        die "Failed to install fastfetch"
+      fi
       rm -rf -- "$package"
-      die "Failed to download fastfetch"
     fi
-    if ! sudo apt install -y "$package/fastfetch.deb"; then
-      rm -rf -- "$package"
-      die "Failed to install fastfetch"
-    fi
-    rm -rf -- "$package"
   fi
   if dpkg-query -W -f='${db:Status-Status}' neofetch 2>/dev/null | grep -qx installed; then
     sudo apt remove -y neofetch
   fi
 }
 
-# Build eza in a temporary directory, using an existing or temporary Rust toolchain.
-build_eza() (
-  local work_dir active_toolchain
-  work_dir="$(mktemp -d)"
-  trap 'rm -rf -- "$work_dir"' EXIT
-  trap 'exit 130' INT
-  trap 'exit 143' TERM
-  mkdir -p "$work_dir/tmp"
-  export TMPDIR="$work_dir/tmp"
-
-  sudo apt install -y pkg-config libssl-dev zlib1g-dev
+# Set up a shared temporary build directory and, if needed, a Rust toolchain.
+prepare_rust_build() {
+  local active_toolchain
+  [[ -z "$RUST_BUILD_DIR" ]] || return 0
+  RUST_BUILD_DIR="$(mktemp -d)"
+  mkdir -p "$RUST_BUILD_DIR/tmp"
+  export TMPDIR="$RUST_BUILD_DIR/tmp"
   if command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1; then
-    # Keep the currently selected rustup toolchain when the checkout specifies another.
     if command -v rustup >/dev/null 2>&1 && [[ -z "${RUSTUP_TOOLCHAIN:-}" ]]; then
       active_toolchain="$(rustup show active-toolchain | awk 'NR == 1 {print $1}')"
       [[ -n "$active_toolchain" ]] || die "No active Rust toolchain"
       export RUSTUP_TOOLCHAIN="$active_toolchain"
     fi
   else
-    export RUSTUP_HOME="$work_dir/rustup" CARGO_HOME="$work_dir/cargo"
-    curl --fail --location --show-error https://sh.rustup.rs -o "$work_dir/rustup-init.sh"
-    sh "$work_dir/rustup-init.sh" -y --no-modify-path --profile minimal --default-toolchain stable
+    export RUSTUP_HOME="$RUST_BUILD_DIR/rustup" CARGO_HOME="$RUST_BUILD_DIR/cargo"
+    curl --fail --location --show-error https://sh.rustup.rs -o "$RUST_BUILD_DIR/rustup-init.sh"
+    sh "$RUST_BUILD_DIR/rustup-init.sh" -y --no-modify-path --profile minimal --default-toolchain stable
     export PATH="$CARGO_HOME/bin:$PATH" RUSTUP_TOOLCHAIN=stable
   fi
+}
 
-  git clone --depth 1 https://github.com/eza-community/eza.git "$work_dir/eza"
-  cd "$work_dir/eza"
-  cargo build --release --locked -j 1
-  sudo install -m 755 target/release/eza /usr/local/bin/eza
+# Build a Rust application in the shared temporary workspace and install it.
+build_rust_tool() {
+  local name="$1" repository="$2"
+  shift 2
+  sudo apt install -y pkg-config libssl-dev zlib1g-dev "$@"
+  prepare_rust_build
+  git clone --depth 1 "$repository" "$RUST_BUILD_DIR/$name"
+  (
+    cd "$RUST_BUILD_DIR/$name"
+    cargo build --release --locked -j 1
+    sudo install -m 755 "target/release/$name" "/usr/local/bin/$name"
+  )
+}
+
+# Install a missing Rust tool from apt or its source repository.
+install_rust_tool() {
+  local name="$1" repository="$2"
+  shift 2
+  if command -v "$name" >/dev/null 2>&1; then
+    echo "$name is already installed."
+  elif [[ -n "$(apt-cache madison "$name")" ]]; then
+    sudo apt install -y "$name"
+  else
+    build_rust_tool "$name" "$repository" "$@"
+  fi
+}
+
+# Install eza and mdcat with one shared temporary toolchain when required.
+install_rust_tools() (
+  RUST_BUILD_DIR=""
+  trap '[[ -z "$RUST_BUILD_DIR" ]] || rm -rf -- "$RUST_BUILD_DIR"' EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  install_rust_tool eza https://github.com/eza-community/eza.git
+  install_rust_tool mdcat https://github.com/BIRSAx2/mdcat.git libcurl4-openssl-dev
 )
 
 # Install Alacritty when an apt package exists for this machine.
 install_optional_alacritty() {
-  if [[ -n "$(apt-cache madison alacritty)" ]]; then
+  if command -v alacritty >/dev/null 2>&1; then
+    echo "alacritty is already installed."
+  elif [[ -n "$(apt-cache madison alacritty)" ]]; then
     sudo apt install -y alacritty
   else
     echo "Alacritty is unavailable; xterm will be used."
   fi
 }
 
-# Install eza from configured apt repositories or build it from source.
-install_eza() {
-  if [[ -n "$(apt-cache madison eza)" ]]; then
-    sudo apt install -y eza
-  else
-    build_eza
-  fi
+# Remove the distribution lolcat package only when it is Ruby based.
+remove_ruby_lolcat() {
+  local installed_path
+  while IFS= read -r installed_path; do
+    if [[ -f "$installed_path" ]] && head -n 1 "$installed_path" | grep -Eq '^#!.*ruby'; then
+      sudo apt remove -y lolcat
+      break
+    fi
+  done < <(dpkg-query -L lolcat 2>/dev/null | grep -E '/(bin|games)/lolcat$' || true)
 }
 
 # Build and install lolcat from its upstream source.
 install_lolcat() {
-  # Builds and installs lolcat from source (idempotent: clone or pull).
+  # Keep an existing compiled lolcat; a Ruby version must be replaced.
+  local current
+  current="$(command -v lolcat || true)"
+  if [[ -n "$current" ]] && ! head -c 128 "$current" | grep -aqE '^#!.*ruby'; then
+    remove_ruby_lolcat
+    echo "lolcat is already installed."
+    return 0
+  fi
   local olddir
   olddir="$(pwd)"
 
@@ -222,13 +264,7 @@ install_lolcat() {
   fi
 
   make
-  local installed_path
-  while IFS= read -r installed_path; do
-    if [[ -f "$installed_path" ]] && head -n 1 "$installed_path" | grep -Eq '^#!.*ruby'; then
-      sudo apt remove -y lolcat
-      break
-    fi
-  done < <(dpkg-query -L lolcat 2>/dev/null | grep -E '/(bin|games)/lolcat$' || true)
+  remove_ruby_lolcat
   sudo make install
 
   cd "${olddir}"
@@ -271,7 +307,7 @@ Desktop (GUI):
 
 Additional installs performed by the script:
 - Fira Code font (downloaded ZIP from GitHub release, installed into ~/.local/share/fonts)
-- eza (from configured apt sources or built from source with Rust)
+- eza and mdcat (from configured apt sources or built from source with Rust)
 - lolcat (built from source; any Ruby-based Debian lolcat is removed)
 EOF
 }
@@ -309,7 +345,7 @@ case "${1:-}" in
     sudo apt update
     sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro
     install_fastfetch
-    install_eza
+    install_rust_tools
     install_lolcat
     install_dotfiles
     exit 0
@@ -336,7 +372,7 @@ case "${1:-}" in
       fonts-font-awesome 
     install_fira_font
     install_fastfetch
-    install_eza
+    install_rust_tools
     install_lolcat
     install_dotfiles
     exit 0
@@ -352,7 +388,7 @@ case "${1:-}" in
     install_optional_alacritty
     install_fira_font
     install_fastfetch
-    install_eza
+    install_rust_tools
     install_lolcat
     install_dotfiles
     exit 0

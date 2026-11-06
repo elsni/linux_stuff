@@ -122,7 +122,7 @@ requires working package repositories, network access, and `sudo` privileges.
 The script expects GNU `readlink -f` for source path resolution.
 
 Package availability depends on your distribution and release. The installer
-requests the package names directly except for fastfetch and eza, whose
+requests the package names directly except for fastfetch, eza, and mdcat, whose
 alternative installation methods are described below.
 
 ### Modes
@@ -131,10 +131,10 @@ alternative installation methods are described below.
 | --- | --- | --- |
 | No argument | None; print usage | None |
 | `-p` | None; print dependency overview | None |
-| `-c` | Console dependencies, eza, lolcat | All Linux dotfiles |
-| `-k` | Console dependencies, eza, lolcat, terminal fonts | All Linux dotfiles |
+| `-c` | Console dependencies, eza, mdcat, lolcat | All Linux dotfiles |
+| `-k` | Console dependencies, eza, mdcat, lolcat, terminal fonts | All Linux dotfiles |
 | `-g` | Desktop dependencies and fonts | All Linux dotfiles |
-| `-a` | Console and desktop dependencies, eza, lolcat, fonts | All Linux dotfiles |
+| `-a` | Console and desktop dependencies, eza, mdcat, lolcat, fonts | All Linux dotfiles |
 | `-d` | None | All Linux dotfiles |
 
 `-c` and `-k` do not install herbstluftwm or Polybar packages. All Linux
@@ -172,14 +172,14 @@ The console modes (`-c`, `-k`, and `-a`) also:
 - Install fastfetch from configured apt sources when available, otherwise download
   the matching official GitHub release DEB for the machine architecture. After
   successful installation, remove an installed Debian neofetch package.
-- Install eza from configured apt repositories when a package is available.
-  Otherwise install build dependencies and build the official source in a
-  temporary directory using Cargo and Rust. An existing toolchain is used as-is;
-  when either Cargo or Rust is missing, a temporary minimal stable toolchain is
-  installed and removed with the build directory. The resulting executable is
-  installed as `/usr/local/bin/eza`. Source builds can take considerable time
-  and need network access. The existing toolchain must meet eza's Rust version
-  requirement.
+- Keep existing eza and mdcat commands; install missing tools from configured
+  apt repositories when available, otherwise build their official sources.
+  Source builds share one Rust toolchain and temporary workspace, which is
+  removed after both tools finish or when the installer exits. An existing Rust
+  toolchain is reused; otherwise a temporary stable toolchain is installed.
+  Builds require build dependencies and network access and may take a long time.
+  The existing toolchain must meet each project's Rust version requirement.
+- Keep an existing fastfetch or compiled lolcat instead of reinstalling it.
 - Clone or update `https://github.com/jaseg/lolcat.git` under `~/source/lolcat`,
   then run `make`, remove a Ruby-based Debian lolcat package if present, and
   run `sudo make install`.

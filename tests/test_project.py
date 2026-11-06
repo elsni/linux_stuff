@@ -112,15 +112,15 @@ sudo() { :; }
 install_fira_font() { echo fonts; }
 # Record fastfetch installation.
 install_fastfetch() { echo fastfetch; }
-# Record eza installation.
-install_eza() { echo eza; }
+# Record Rust tool installation.
+install_rust_tools() { echo eza; echo mdcat; }
 # Record lolcat installation.
 install_lolcat() { echo lolcat; }
 # Record dotfile installation.
 install_dotfiles() { echo dotfiles; }
 set -- -k
 """ + (ROOT / 'install_debian').read_text().split('# ---------------------- main')[1].split('\n', 1)[1], Path(d))
-            for dependency in ('fonts', 'fastfetch', 'eza', 'lolcat', 'dotfiles'):
+            for dependency in ('fonts', 'fastfetch', 'eza', 'mdcat', 'lolcat', 'dotfiles'):
                 self.assertIn(dependency, result.stdout.splitlines())
 
     def test_fastfetch_apt_and_release(self):
@@ -128,6 +128,7 @@ set -- -k
         with tempfile.TemporaryDirectory() as d:
             for candidate in ('1.2', '(none)'):
                 commands = """
+command() { if [[ "$1" == -v && "$2" == fastfetch ]]; then return 1; fi; builtin command "$@"; }
 apt-cache() { printf '  Candidate: %s\n' "$TEST_CANDIDATE"; }
 dpkg() { printf '%s\n' i386; }
 dpkg-query() { printf installed; }
