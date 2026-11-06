@@ -37,7 +37,14 @@ class ProjectTests(unittest.TestCase):
             self.assertEqual((backups[0] / 'original').read_text(), 'original\n')
             for source in (ROOT / 'home/.config').iterdir():
                 if source.is_dir():
-                    self.assertEqual((home / '.config' / source.name).resolve(), source)
+                    destination = home / '.config' / source.name
+                    if source.name == 'mc':
+                        self.assertTrue(destination.is_dir())
+                        self.assertFalse(destination.is_symlink())
+                        self.assertEqual((destination / 'ini').read_bytes(),
+                                         (source / 'ini').read_bytes())
+                    else:
+                        self.assertEqual(destination.resolve(), source)
 
     def test_dependency_listing(self):
         """Print apt dependencies without modifying the host."""

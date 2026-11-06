@@ -56,7 +56,20 @@ create_safelink() {
   ln -s -- "$src" "$dest"
 }
 
-# Link repository dotfiles into the current user home.
+# Install a writable Midnight Commander configuration without modifying its source.
+install_mc_config() {
+  local src="$1" dest="${HOME}/.config/mc" temp
+  if [[ -L "$dest" ]]; then
+    temp="$(mktemp -d "${HOME}/.config/.mc-copy.XXXXXXXX")"
+    cp -aL -- "$dest/." "$temp/"
+    rm -- "$dest"
+    mv -- "$temp" "$dest"
+  elif [[ ! -e "$dest" ]]; then
+    cp -a -- "$src" "$dest"
+  fi
+}
+
+# Install repository dotfiles into the current user home.
 install_dotfiles() {
   # Installs dotfiles and ~/.config entries by creating symlinks into the repo.
   local repo_home="${SCRIPT_DIR}/home"
@@ -73,7 +86,11 @@ install_dotfiles() {
     [[ -d "$d" ]] || continue
     local name
     name="$(basename -- "${d%/}")"
-    create_safelink ".config/${name}" "$d"
+    if [[ "$name" == mc ]]; then
+      install_mc_config "$d"
+    else
+      create_safelink ".config/${name}" "$d"
+    fi
   done
 
   # Link selected dotfiles from home/ -> ~/

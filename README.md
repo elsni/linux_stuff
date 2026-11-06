@@ -354,6 +354,11 @@ The neofetch configuration is retained in the repository, although the shell
 now runs fastfetch. Linux installers do not create or update `.bash_profile`.
 They use `$HOME/.config` directly rather than an alternative `XDG_CONFIG_HOME`.
 
+On Debian-based systems, the installer keeps `~/.config/mc` as a writable
+copy instead of linking it to the repository. An existing directory is kept
+on subsequent runs. An existing symlink is converted to a copy of its current
+contents. Repository updates do not overwrite the user's existing settings.
+
 ### Backup format
 
 Before replacing an existing regular file or directory, the installer reserves a
