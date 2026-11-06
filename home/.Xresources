@@ -1,4 +1,5 @@
 XTerm*renderFont: true
+XTerm*termName: xterm-256color
 XTerm*faceName: Fira Code
 XTerm*faceSize: 9
 XTerm*background: black
