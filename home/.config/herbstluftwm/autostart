@@ -316,4 +316,3 @@ else
 fi
 hc spawn sh $HOME/.config/polybar/launch.sh
 hc spawn nm-applet
-hc spawn blueman-applet

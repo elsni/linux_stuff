@@ -570,3 +570,5 @@ runs did not record which packages were present beforehand. It does not remove
 other shell tools, configuration, caches, or orphan dependencies. No force or
 dependency-ignoring uninstall is used. Rerunning is supported. Installations of
 neofetch outside the selected Homebrew are reported if still in PATH, not deleted.
+
+The Bluetooth tray icon can be started on demand with blueman-applet.
