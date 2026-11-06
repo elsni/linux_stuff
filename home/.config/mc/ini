@@ -97,7 +97,7 @@ menubar_visible=true
 free_space=true
 horizontal_split=false
 vertical_equal=true
-left_panel_size=73
+left_panel_size=40
 top_panel_size=0
 horizontal_equal=true
 
@@ -116,6 +116,10 @@ clipboard_paste=
 base_color=
 xterm-256color=
 color_terminals=
+
+linux=
+
+rxvt-unicode-256color=
 
 [Panels]
 show_mini_info=true
