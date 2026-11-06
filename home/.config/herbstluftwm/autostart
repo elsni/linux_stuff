@@ -284,6 +284,11 @@ for state in active urgent normal ; do
         attr theme.${state}.outer_color C
 done
 hc attr theme.active.outer_width 1
+if [ "$SMALLSCREEN" = true ]; then
+    hc attr theme.border_width 2
+    hc attr theme.floating.border_width 2
+    hc attr theme.active.outer_width 0
+fi
 hc attr theme.background_color '#141414'
 
 hc set window_gap 0
