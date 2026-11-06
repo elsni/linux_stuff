@@ -152,6 +152,10 @@ the commands required by the Bash greeting and aliases.
 Choose one installation command for the setup you want; these examples are
 alternatives, not a sequence to execute in full.
 
+On an active 1024×600 display, the herbstluftwm autostart selects the
+compact Polybar configuration and a dedicated wallpaper with readable shortcut
+labels. Other resolutions use the regular wallpaper and panel configuration.
+
 ### Package and download behavior
 
 Console packages include build tools, Git, curl, unzip, CA certificates,

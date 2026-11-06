@@ -9,6 +9,9 @@ ALT=Mod1    # ALT is 2nd modifyer, mainly for starting apps
 # set this to true if you want to save space
 # tested on 1024x600 netbook
 SMALLSCREEN=false
+if xrandr --current | awk '$1 == "1024x600" && /\*/ { found = 1 } END { exit !found }'; then
+    SMALLSCREEN=true
+fi
 
 TERMINAL=alacritty
 BROWSER=brave-browser
@@ -297,7 +300,11 @@ hc set mouse_recenter_gap 0
 
 #############################################################################################################
 # app autostart
-xwallpaper --zoom $HOME/.config/herbstluftwm/assets/wallpaper.jpg
+if [ "$SMALLSCREEN" = true ]; then
+    xwallpaper --zoom "$HOME/.config/herbstluftwm/assets/wallpaper-1024x600.jpg"
+else
+    xwallpaper --zoom "$HOME/.config/herbstluftwm/assets/wallpaper.jpg"
+fi
 hc spawn sh $HOME/.config/polybar/launch.sh
 hc spawn nm-applet
 hc spawn blueman-applet
