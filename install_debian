@@ -186,6 +186,15 @@ build_eza() (
   sudo install -m 755 target/release/eza /usr/local/bin/eza
 )
 
+# Install Alacritty when an apt package exists for this machine.
+install_optional_alacritty() {
+  if [[ -n "$(apt-cache madison alacritty)" ]]; then
+    sudo apt install -y alacritty
+  else
+    echo "Alacritty is unavailable; xterm will be used."
+  fi
+}
+
 # Install eza from configured apt repositories or build it from source.
 install_eza() {
   if [[ -n "$(apt-cache madison eza)" ]]; then
@@ -311,7 +320,8 @@ case "${1:-}" in
     sudo apt update
     sudo apt install -y curl unzip fontconfig ca-certificates \
       herbstluftwm polybar xterm xwallpaper fonts-noto fonts-noto-color-emoji \
-      fonts-font-awesome ssh-askpass rofi lxappearance alacritty
+      fonts-font-awesome ssh-askpass rofi lxappearance
+    install_optional_alacritty
     install_fira_font
     install_dotfiles
     exit 0
@@ -338,7 +348,8 @@ case "${1:-}" in
     sudo apt install -y build-essential git curl unzip fontconfig ca-certificates \
       xterm xwallpaper python3 toilet mc nano micro \
       herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome \
-      ssh-askpass rofi lxappearance alacritty
+      ssh-askpass rofi lxappearance
+    install_optional_alacritty
     install_fira_font
     install_fastfetch
     install_eza

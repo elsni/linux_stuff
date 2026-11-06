@@ -155,6 +155,8 @@ alternatives, not a sequence to execute in full.
 On an active 1024×600 display, the herbstluftwm autostart selects the
 compact Polybar configuration and a dedicated wallpaper with readable shortcut
 labels. Other resolutions use the regular wallpaper and panel configuration.
+The X server manages connected displays, while Polybar discovers wired and
+wireless interfaces by type instead of requiring machine-specific names.
 
 ### Package and download behavior
 
@@ -181,6 +183,9 @@ The console modes (`-c`, `-k`, and `-a`) also:
 The font modes (`-k`, `-g`, and `-a`) download the Fira Code Nerd Fonts ZIP from
 release `v3.4.0`, extract it into `~/.local/share/fonts`, and run `fc-cache -f`.
 The download temporarily uses `Fira_Code.zip` in the current working directory.
+
+The desktop modes install Alacritty only when an apt package is available;
+xterm remains available as a terminal otherwise.
 
 Desktop dependencies include herbstluftwm, Polybar, xterm, xwallpaper, rofi,
 lxappearance, Alacritty, ssh-askpass, Noto fonts, emoji fonts, and Font Awesome.

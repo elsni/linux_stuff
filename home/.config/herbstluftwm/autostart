@@ -217,17 +217,7 @@ hc set tree_style '╾│ ├└╼─┐'
 hc unlock
 
 #############################################################################################################
-# Screen Setup[A]
-# check if HDMI-Display is present
-if xrandr -q | grep "HDMI-1 connected"; then
-  xrandr --output eDP-1 --off    # Switch off Laptop display
-  xrandr --output HDMI-1 --on    # Switch on external display
-else
-  xrandr --output eDP-1 --on    # Switch on Laptop display
-  xrandr --output HDMI-1 --off    # Switch off external display
-fi
-
-# shuld find ether laptop display or external display
+# Detect the displays currently configured by the X server.
 hc detect_monitors
 
 # make room for polybar
