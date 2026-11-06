@@ -155,7 +155,7 @@ alternatives, not a sequence to execute in full.
 ### Package and download behavior
 
 Console packages include build tools, Git, curl, unzip, CA certificates,
-fastfetch, toilet, Midnight Commander, nano, micro, and nala.
+fastfetch, toilet, Midnight Commander, nano, and micro.
 
 The console modes (`-c`, `-k`, and `-a`) also:
 

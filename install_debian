@@ -246,7 +246,6 @@ Base tools (console):
 - mc
 - nano
 - micro
-- nala (.deb systems only)
 
 Desktop (GUI):
 - herbstluftwm
@@ -299,7 +298,7 @@ case "${1:-}" in
     is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing console stuff..."
     sudo apt update
-    sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro nala
+    sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro
     install_fastfetch
     install_eza
     install_lolcat
@@ -321,7 +320,7 @@ case "${1:-}" in
     is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing terminal on desktop stuff..."
     sudo apt update
-    sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro nala
+    sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro
     sudo apt install -y curl unzip fontconfig ca-certificates \
       fonts-noto fonts-noto-color-emoji \
       fonts-font-awesome 
@@ -337,7 +336,7 @@ case "${1:-}" in
     echo "installing everything..."
     sudo apt update
     sudo apt install -y build-essential git curl unzip fontconfig ca-certificates \
-      xterm xwallpaper python3 toilet mc nano micro nala \
+      xterm xwallpaper python3 toilet mc nano micro \
       herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome \
       ssh-askpass rofi lxappearance alacritty
     install_fira_font
