@@ -119,6 +119,42 @@ install_fira_font() {
   fc-cache -f
 }
 
+# Install fastfetch from configured apt sources or the official GitHub release.
+install_fastfetch() {
+  local candidate arch asset url package
+  candidate="$(LC_ALL=C apt-cache policy fastfetch | awk '/Candidate:/ {print $2}')"
+  if [[ -n "$candidate" && "$candidate" != "(none)" ]]; then
+    sudo apt install -y fastfetch
+  else
+    arch="$(dpkg --print-architecture)"
+    case "$arch" in
+      amd64) asset=amd64 ;;
+      i386) asset=i686 ;;
+      arm64) asset=aarch64 ;;
+      armhf) asset=armv7l ;;
+      ppc64el) asset=ppc64le ;;
+      riscv64|s390x|loongarch64) asset="$arch" ;;
+      *) die "No official fastfetch release mapping for architecture: $arch" ;;
+    esac
+    url="$(curl --fail --location --show-error https://api.github.com/repos/fastfetch-cli/fastfetch/releases/latest |
+      python3 -c 'import json,sys; name="fastfetch-linux-" + sys.argv[1] + ".deb"; matches=[a["browser_download_url"] for a in json.load(sys.stdin)["assets"] if a["name"] == name]; print(matches[0] if len(matches) == 1 else "")' "$asset")"
+    [[ -n "$url" ]] || die "Official fastfetch package not found for $arch"
+    package="$(mktemp -d)"
+    if ! curl --fail --location --show-error "$url" -o "$package/fastfetch.deb"; then
+      rm -rf -- "$package"
+      die "Failed to download fastfetch"
+    fi
+    if ! sudo apt install -y "$package/fastfetch.deb"; then
+      rm -rf -- "$package"
+      die "Failed to install fastfetch"
+    fi
+    rm -rf -- "$package"
+  fi
+  if dpkg-query -W -f='${db:Status-Status}' neofetch 2>/dev/null | grep -qx installed; then
+    sudo apt remove -y neofetch
+  fi
+}
+
 # Install eza from its upstream apt repository.
 install_eza() {
   # Installs eza via the upstream deb repository.
@@ -157,6 +193,13 @@ install_lolcat() {
   fi
 
   make
+  local installed_path
+  while IFS= read -r installed_path; do
+    if [[ -f "$installed_path" ]] && head -n 1 "$installed_path" | grep -Eq '^#!.*ruby'; then
+      sudo apt remove -y lolcat
+      break
+    fi
+  done < <(dpkg-query -L lolcat 2>/dev/null | grep -E '/(bin|games)/lolcat$' || true)
   sudo make install
 
   cd "${olddir}"
@@ -177,7 +220,8 @@ Base tools (console):
 - unzip
 - ca-certificates
 - fontconfig (for fc-cache)
-- fastfetch
+- python3
+- fastfetch (apt or official GitHub release)
 - toilet
 - mc
 - nano
@@ -200,7 +244,7 @@ Desktop (GUI):
 Additional installs performed by the script:
 - Fira Code font (downloaded ZIP from GitHub release, installed into ~/.local/share/fonts)
 - eza (via deb repo on apt systems)
-- lolcat (built from source via git clone + make + sudo make install)
+- lolcat (built from source; any Ruby-based Debian lolcat is removed)
 EOF
 }
 
@@ -235,7 +279,8 @@ case "${1:-}" in
     is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing console stuff..."
     sudo apt update
-    sudo apt install -y build-essential git curl unzip ca-certificates fastfetch toilet mc nano micro nala
+    sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro nala
+    install_fastfetch
     install_eza
     install_lolcat
     install_dotfiles
@@ -256,11 +301,12 @@ case "${1:-}" in
     is_apt_system || die "apt not found. Use -p to print dependencies for non-apt systems."
     echo "installing terminal on desktop stuff..."
     sudo apt update
-    sudo apt install -y build-essential git curl unzip ca-certificates fastfetch toilet mc nano micro nala
+    sudo apt install -y build-essential git curl unzip ca-certificates python3 toilet mc nano micro nala
     sudo apt install -y curl unzip fontconfig ca-certificates \
       fonts-noto fonts-noto-color-emoji \
       fonts-font-awesome 
     install_fira_font
+    install_fastfetch
     install_eza
     install_lolcat
     install_dotfiles
@@ -271,10 +317,11 @@ case "${1:-}" in
     echo "installing everything..."
     sudo apt update
     sudo apt install -y build-essential git curl unzip fontconfig ca-certificates \
-      xterm xwallpaper fastfetch toilet mc nano micro nala \
+      xterm xwallpaper python3 toilet mc nano micro nala \
       herbstluftwm polybar fonts-noto fonts-noto-color-emoji fonts-font-awesome \
       ssh-askpass rofi lxappearance alacritty
     install_fira_font
+    install_fastfetch
     install_eza
     install_lolcat
     install_dotfiles

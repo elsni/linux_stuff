@@ -110,6 +110,8 @@ is_apt_system() { return 0; }
 sudo() { :; }
 # Record font installation.
 install_fira_font() { echo fonts; }
+# Record fastfetch installation.
+install_fastfetch() { echo fastfetch; }
 # Record eza installation.
 install_eza() { echo eza; }
 # Record lolcat installation.
@@ -118,8 +120,35 @@ install_lolcat() { echo lolcat; }
 install_dotfiles() { echo dotfiles; }
 set -- -k
 """ + (ROOT / 'install_debian').read_text().split('# ---------------------- main')[1].split('\n', 1)[1], Path(d))
-            for dependency in ('fonts', 'eza', 'lolcat', 'dotfiles'):
+            for dependency in ('fonts', 'fastfetch', 'eza', 'lolcat', 'dotfiles'):
                 self.assertIn(dependency, result.stdout.splitlines())
+
+    def test_fastfetch_apt_and_release(self):
+        """Select an apt candidate or the matching official i386 release."""
+        with tempfile.TemporaryDirectory() as d:
+            for candidate in ('1.2', '(none)'):
+                commands = """
+apt-cache() { printf '  Candidate: %s\n' "$TEST_CANDIDATE"; }
+dpkg() { printf '%s\n' i386; }
+dpkg-query() { printf installed; }
+sudo() { local IFS=' '; printf 'sudo %s\n' "$*"; }
+curl() {
+  if [[ "$*" == *api.github.com* ]]; then
+    printf '%s' '{"assets":[{"name":"fastfetch-linux-i686.deb","browser_download_url":"https://example.org/i686.deb"}]}'
+  else
+    printf 'download %s\n' "$1"
+  fi
+}
+install_fastfetch
+""".replace('$TEST_CANDIDATE', candidate)
+                result = self.run_functions('install_debian', commands, Path(d))
+                self.assertIn('apt remove -y neofetch', result.stdout)
+                if candidate == '1.2':
+                    self.assertIn('apt install -y fastfetch', result.stdout)
+                    self.assertNotIn('download ', result.stdout)
+                else:
+                    self.assertIn('download ', result.stdout)
+                    self.assertIn('/fastfetch.deb', result.stdout)
 
     def test_desktop_configuration(self):
         """Check portable workspace paths and the configured mouse modifier."""

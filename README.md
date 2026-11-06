@@ -122,9 +122,8 @@ requires working package repositories, network access, and `sudo` privileges.
 The script expects GNU `readlink -f` for source path resolution.
 
 Package availability depends on your distribution and release. The installer
-requests the package names directly; it does not translate unavailable packages
-or automatically add alternative sources for them, apart from the eza repository
-setup described below.
+requests the package names directly except for fastfetch and eza, whose
+alternative sources are described below.
 
 ### Modes
 
@@ -160,11 +159,15 @@ fastfetch, toilet, Midnight Commander, nano, micro, and nala.
 
 The console modes (`-c`, `-k`, and `-a`) also:
 
+- Install fastfetch from configured apt sources when available, otherwise download
+  the matching official GitHub release DEB for the machine architecture. After
+  successful installation, remove an installed Debian neofetch package.
 - Install eza through its upstream apt repository at `https://deb.gierens.de`.
   The script manages `/etc/apt/keyrings/gierens.gpg` and
   `/etc/apt/sources.list.d/gierens.list` when setting up the key.
 - Clone or update `https://github.com/jaseg/lolcat.git` under `~/source/lolcat`,
-  then run `make` and `sudo make install`.
+  then run `make`, remove a Ruby-based Debian lolcat package if present, and
+  run `sudo make install`.
 
 The font modes (`-k`, `-g`, and `-a`) download the Fira Code Nerd Fonts ZIP from
 release `v3.4.0`, extract it into `~/.local/share/fonts`, and run `fc-cache -f`.
