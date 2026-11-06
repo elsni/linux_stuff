@@ -123,7 +123,7 @@ The script expects GNU `readlink -f` for source path resolution.
 
 Package availability depends on your distribution and release. The installer
 requests the package names directly except for fastfetch and eza, whose
-alternative sources are described below.
+alternative installation methods are described below.
 
 ### Modes
 
@@ -162,9 +162,14 @@ The console modes (`-c`, `-k`, and `-a`) also:
 - Install fastfetch from configured apt sources when available, otherwise download
   the matching official GitHub release DEB for the machine architecture. After
   successful installation, remove an installed Debian neofetch package.
-- Install eza through its upstream apt repository at `https://deb.gierens.de`.
-  The script manages `/etc/apt/keyrings/gierens.gpg` and
-  `/etc/apt/sources.list.d/gierens.list` when setting up the key.
+- Install eza from configured apt repositories when a package is available.
+  Otherwise install build dependencies and build the official source in a
+  temporary directory using Cargo and Rust. An existing toolchain is used as-is;
+  when either Cargo or Rust is missing, a temporary minimal stable toolchain is
+  installed and removed with the build directory. The resulting executable is
+  installed as `/usr/local/bin/eza`. Source builds can take considerable time
+  and need network access. The existing toolchain must meet eza's Rust version
+  requirement.
 - Clone or update `https://github.com/jaseg/lolcat.git` under `~/source/lolcat`,
   then run `make`, remove a Ruby-based Debian lolcat package if present, and
   run `sudo make install`.

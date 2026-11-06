@@ -155,24 +155,44 @@ install_fastfetch() {
   fi
 }
 
-# Install eza from its upstream apt repository.
-install_eza() {
-  # Installs eza via the upstream deb repository.
-  sudo apt install -y gpg wget
-  sudo mkdir -p /etc/apt/keyrings
+# Build eza in a temporary directory, using an existing or temporary Rust toolchain.
+build_eza() (
+  local work_dir active_toolchain
+  work_dir="$(mktemp -d)"
+  trap 'rm -rf -- "$work_dir"' EXIT
+  trap 'exit 130' INT
+  trap 'exit 143' TERM
+  mkdir -p "$work_dir/tmp"
+  export TMPDIR="$work_dir/tmp"
 
-  if [ ! -f "/etc/apt/keyrings/gierens.gpg" ]; then
-    wget -qO- "https://raw.githubusercontent.com/eza-community/eza/main/deb.asc" \
-      | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-
-    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] https://deb.gierens.de stable main" \
-      | sudo tee /etc/apt/sources.list.d/gierens.list >/dev/null
-
-    sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+  sudo apt install -y pkg-config libssl-dev zlib1g-dev
+  if command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1; then
+    # Keep the currently selected rustup toolchain when the checkout specifies another.
+    if command -v rustup >/dev/null 2>&1 && [[ -z "${RUSTUP_TOOLCHAIN:-}" ]]; then
+      active_toolchain="$(rustup show active-toolchain | awk 'NR == 1 {print $1}')"
+      [[ -n "$active_toolchain" ]] || die "No active Rust toolchain"
+      export RUSTUP_TOOLCHAIN="$active_toolchain"
+    fi
+  else
+    export RUSTUP_HOME="$work_dir/rustup" CARGO_HOME="$work_dir/cargo"
+    curl --fail --location --show-error https://sh.rustup.rs -o "$work_dir/rustup-init.sh"
+    sh "$work_dir/rustup-init.sh" -y --no-modify-path --profile minimal --default-toolchain stable
+    export PATH="$CARGO_HOME/bin:$PATH" RUSTUP_TOOLCHAIN=stable
   fi
 
-  sudo apt update
-  sudo apt install -y eza
+  git clone --depth 1 https://github.com/eza-community/eza.git "$work_dir/eza"
+  cd "$work_dir/eza"
+  cargo build --release --locked -j 1
+  sudo install -m 755 target/release/eza /usr/local/bin/eza
+)
+
+# Install eza from configured apt repositories or build it from source.
+install_eza() {
+  if [[ -n "$(apt-cache madison eza)" ]]; then
+    sudo apt install -y eza
+  else
+    build_eza
+  fi
 }
 
 # Build and install lolcat from its upstream source.
@@ -243,7 +263,7 @@ Desktop (GUI):
 
 Additional installs performed by the script:
 - Fira Code font (downloaded ZIP from GitHub release, installed into ~/.local/share/fonts)
-- eza (via deb repo on apt systems)
+- eza (from configured apt sources or built from source with Rust)
 - lolcat (built from source; any Ruby-based Debian lolcat is removed)
 EOF
 }
